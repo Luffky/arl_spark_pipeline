@@ -162,11 +162,21 @@ def export_image_to_fits(im: Image, fitsfile: str = 'imaging.fits'):
     assert isinstance(im, Image), im
     return fits.writeto(filename=fitsfile, data=im.data, header=im.wcs.to_header(), overwrite=True)
 
-def export_images_to_fits(im, nchan, fitsfile: str = "imaging.fitsi"):
-    data = numpy.empty([nchan, im[0][1][0].npol, im[0][1][0].nheight, im[0][1][0].nwidth])
+def export_images_to_fits(im, nchan, fitsfile: str = "imaging.fits", has_sumwt=True):
+    if has_sumwt:
+        data = numpy.empty([nchan, im[0][1][0].npol, im[0][1][0].nheight, im[0][1][0].nwidth])
+        header = im[0][1][0].wcs.to_header()
+    else:
+        data = numpy.empty([nchan, im[0][1].npol, im[0][1].nheight, im[0][1].nwidth])
+        header = im[0][1].wcs.to_header()
+
     for image in im:
-        data[image[0][2]] = image[1][0].data[0]
-    return fits.writeto(filename=fitsfile, data=data, header=im[0][1][0].wcs.to_header(), overwrite=True)
+        if has_sumwt:
+            data[image[0][2]] = image[1][0].data[0]
+        else:
+            data[image[0][2]] = image[1].data[0]
+
+    return fits.writeto(filename=fitsfile, data=data, header=header, overwrite=True)
 
 
 

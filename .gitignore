@@ -1,7 +1,7 @@
-dirty.fits
-psf.fits
+*.fits
 /csv_spark
 /.idea
+/develop_csv
 /examples/**/*.rst
 /examples/**/*.html
 /examples/**/*.fits

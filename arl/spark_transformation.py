@@ -2,19 +2,25 @@ from collections import defaultdict
 from pyspark import SparkContext, SparkFiles
 from astropy.wcs import WCS
 from arl.image.operations import create_image_from_array, create_empty_image_like
+from arl.image.gather_scatter import *
 from arl.skycomponent.operations import insert_skycomponent
 from arl.util.testing_support import create_low_test_beam, create_low_test_skycomponents_from_gleam, simulate_gaintable
 from arl.imaging.imaging_context import imaging_context
 from arl.imaging.base import create_image_from_visibility, normalize_sumwt
 from arl.visibility.coalesce import *
 from arl.visibility.base import *
+from arl.visibility.operations import divide_visibility, integrate_visibility_by_channel
+from arl.calibration.operations import append_gaintable
+from arl.calibration.solvers import solve_gaintable
 from astropy import units as u
 from arl.calibration.solvers import create_gaintable_from_blockvisibility
 from arl.calibration.calibration import apply_gaintable
 import numpy as np
 from arl.graphs.delayed import sum_invert_results
-from arl.image.operations import copy_image
+from arl.image.operations import copy_image, qa_image
 from arl.visibility.iterators import *
+from arl.visibility.gather_scatter import visibility_gather_channel
+from arl.image.deconvolution import deconvolve_cube, restore_cube
 
 from arl.visibility.base import create_blockvisibility, create_visibility
 from arl.util.testing_support import create_named_configuration, simulate_gaintable, create_low_test_image_from_gleam
@@ -107,11 +113,121 @@ def create_empty_image(vis_graph_list, npixel, cellsize, frequency, channel_band
     result = create_empty_handle(vis_graph_list, npixel, cellsize, frequency, channel_bandwidth, polarisation_frame)
     return result
 
-def create_invert_graph(sc, vis_graph_list, template_model_graph, dopsf=False, normalize=True, facets=1, vis_slices=None, context="2d", **kwargs):
+def create_invert_graph(vis_graph_list, template_model_graph, dopsf=False, normalize=True, facets=1, vis_slices=None, context="2d", **kwargs):
     c = imaging_context(context)
-    results_vis_graph_list = invert_handle(sc, template_model_graph, vis_graph_list, context=context, dopsf=dopsf,
+    results_vis_graph_list = invert_handle(template_model_graph, vis_graph_list, context=context, dopsf=dopsf,
                                            normalize=normalize, facets=facets, vis_slices=vis_slices, **kwargs)
     return results_vis_graph_list
+
+def create_zero_vis_graph(vis_graph_list):
+    return vis_graph_list.map(zero_vis_kernel)
+
+def create_subtract_vis_graph_list(vis_graph_list, model_vis_graph_list):
+    result_vis_graph_list = subtract_handle(vis_graph_list, model_vis_graph_list)
+    return result_vis_graph_list
+
+def create_residual_graph(vis_graph_list, model_graph, context="2d", vis_slices=1, facets=1, nchan=16, **kwargs):
+    model_vis = create_zero_vis_graph(vis_graph_list)
+    model_vis = create_predict_graph(model_vis, model_graph, vis_slices=vis_slices, facets=facets, context=context, nfrequency=nchan, **kwargs)
+    residual_vis = create_subtract_vis_graph_list(vis_graph_list, model_vis)
+    return create_invert_graph(residual_vis, model_graph, dopsf=False, normalize=True, context=context, vis_slices=vis_slices, facets=facets, **kwargs)
+
+def create_calibrate_graph_list(vis_graph_list, model_vis_graph_list, global_solution=True, **kwargs):
+    if global_solution:
+        point_vis_graph_list = divide_handle(vis_graph_list, model_vis_graph_list)
+        point_vis_graph_list = [tup[1] for tup in point_vis_graph_list.collect()]
+        global_point_vis_graph = visibility_gather_channel(point_vis_graph_list)
+        global_point_vis_graph = integrate_visibility_by_channel(global_point_vis_graph)
+        gt_graph = solve_gaintable(global_point_vis_graph, **kwargs)
+        return apply_gain_handle(vis_graph_list, gt_graph)
+
+    else:
+        return solve_and_apply_handle(vis_graph_list, model_vis_graph_list, **kwargs)
+
+def create_deconvolve_graph(sc, dirty_graph, psf_graph, model_graph, **kwargs):
+    def make_cube(img_graph, nchan, has_sumwt=True, ret_idx=False):
+        imgs = img_graph.collect()
+        l = [Image() for i in range(nchan)]
+        idx = [() for i in range(nchan)]
+        for tup in imgs:
+            if has_sumwt:
+                l[tup[0][2]] = tup[1][0]
+            else:
+                l[tup[0][2]] = tup[1]
+            if ret_idx:
+                idx[tup[0][2]] = tup[0]
+        if ret_idx:
+            return l, idx
+        else :
+            return l
+
+    nchan = get_parameter(kwargs, "nchan", 1)
+    algorithm = get_parameter(kwargs, "algorithm", "mmclean")
+    if algorithm == "mmclean" and nchan > 1:
+        im, idx = make_cube(dirty_graph, nchan, ret_idx=True)
+        dirty_cube = image_gather_channels(im, subimages=nchan)
+        psf_cube = image_gather_channels(make_cube(psf_graph, nchan), subimages=nchan)
+        model_cube = image_gather_channels(make_cube(model_graph, nchan, has_sumwt=False), subimages=nchan)
+        result = deconvolve_cube(dirty_cube, psf_cube, **kwargs)
+        result[0].data += model_cube.data
+        ret_img = []
+        pl = result[0].polarisation_frame
+        nchan, npol, ny, nx = result[0].shape
+        for i in range(nchan):
+            wcs = result[0].wcs.deepcopy()
+            wcs.wcs.crpix[3] -= i
+            ret_img.append(create_image_from_array(result[0].data[i, ...].reshape(1, npol, ny, nx), wcs, pl))
+
+        return sc.parallelize([i for i in range(nchan)]).map(lambda ix: (idx[ix], ret_img[ix]))
+
+    else:
+        return deconvolve_handle(dirty_graph, psf_graph, model_graph, **kwargs)
+
+def create_deconvolve_facet_graph(dirty_graph, psf_graph, model_graph, facets=1, **kwargs):
+    return deconvolve_by_facet_handle(dirty_graph, psf_graph, model_graph, facets=facets, **kwargs)
+
+def create_restore_graph(deconvolve_model_graph, psf_graph, residual_graph, **kwargs):
+    return restore_handle(deconvolve_model_graph, psf_graph, residual_graph, **kwargs)
+
+def create_ical_graph(sc, vis_graph_list, model_graph, nchan, context="2d", vis_slices=1, facets=1, first_selfcal=None, **kwargs):
+    psf_graph = create_invert_graph(vis_graph_list, model_graph, vis_slices=vis_slices, context=context,
+                                    facets=facets,
+                                    dopsf=True)
+
+    if first_selfcal is not None and first_selfcal == 0:
+        model_vis_graph_list = create_zero_vis_graph(vis_graph_list)
+        model_vis_graph_list = create_predict_graph(model_vis_graph_list, model_graph, vis_slices=vis_slices, facets=facets,
+                                                    context=context, nfrequency=nchan, **kwargs)
+        vis_graph_list = create_calibrate_graph_list(vis_graph_list, model_vis_graph_list, **kwargs)
+        residual_vis_graph_list = create_subtract_vis_graph_list(vis_graph_list, model_vis_graph_list)
+        residual_graph = create_invert_graph(residual_vis_graph_list, model_graph, dopsf=True, context=context, vis_slices=vis_slices, facets=facets, **kwargs)
+
+    else:
+        residual_graph = create_residual_graph(vis_graph_list, model_graph, context=context, vis_slices=vis_slices, facets=facets, nchan=nchan, **kwargs)
+
+
+    # deconvolve_model_graph = create_deconvolve_graph(sc, residual_graph, psf_graph, model_graph, nchan=nchan, **kwargs)
+    deconvolve_model_graph = create_deconvolve_facet_graph(residual_graph, psf_graph, model_graph, facets=2, **kwargs)
+
+    # nmajor = get_parameter(kwargs, "nmajor", 5)
+    # if nmajor > 1:
+    #     for cycle in range(nmajor):
+    #         if first_selfcal is not None and cycle >= first_selfcal:
+    #             model_vis_graph_list = create_zero_vis_graph(vis_graph_list)
+    #             model_vis_graph_list = create_predict_graph(model_vis_graph_list, deconvolve_model_graph, vis_slices=vis_slices, facets=facets,
+    #                                                     context=context, nfrequency=nchan, **kwargs)
+    #             vis_graph_list = create_calibrate_graph_list(vis_graph_list, model_vis_graph_list, **kwargs)
+    #             residual_vis_graph_list = create_subtract_vis_graph_list(vis_graph_list, model_vis_graph_list)
+    #             residual_graph = create_invert_graph(residual_vis_graph_list, model_graph, dopsf=False, context=context, vis_slices=vis_slices, facets=facets, **kwargs)
+    #
+    #         else:
+    #             residual_graph = create_residual_graph(vis_graph_list, deconvolve_model_graph, context=context, vis_slices=vis_slices, facets=facets, nchan=nchan, **kwargs)
+    #
+    #         deconvolve_model_graph = create_deconvolve_graph(sc, residual_graph, psf_graph, deconvolve_model_graph, nchan=nchan, **kwargs)
+    residual_graph = create_residual_graph(vis_graph_list, deconvolve_model_graph, context=context, vis_slices=vis_slices, facets=facets, nchan=nchan, **kwargs)
+
+    restore_graph = create_restore_graph(deconvolve_model_graph, psf_graph, residual_graph, **kwargs)
+    return residual_graph, deconvolve_model_graph, restore_graph
 
 
 def extract_lsm_handle(sc: SparkContext, flux_limit, polarisation_frame, frequencys, phasecentre,
@@ -341,14 +457,17 @@ def degrid_handle(reppre_ifft, telescope_data, context, vis_slices, facets, nfre
         .combineByKey(gather_vis_createCombiner_kernel, gather_vis_mergeValue_kernel, gather_vis_mergeCombiner_kernel)\
         .join(telescope_data_origin).mapValues(lambda data: gather_vis_kernel(data, vis_slices=vis_slices, vis_iter=c["vis_iterator"], **kwargs))
 
-def scatter_image_flatmap(ixs, facets, image_iter, **kwargs):
+def scatter_image_flatmap(ixs, facets, image_iter, change_key=False, **kwargs):
     iix, im = ixs
     id = 0
     ret = []
     for subim in image_iter(im, facets=facets, **kwargs):
         subim.facet_id = id
         id += 1
-        ret.append((iix, subim))
+        if change_key:
+            ret.append((iix[0], iix[1], iix[2], iix[3], id, iix[5], subim))
+        else:
+            ret.append((iix, subim))
     return iter(ret)
 
 def scatter_vis_flatmap(ixs, vis_slices, vis_iter, **kwargs):
@@ -426,7 +545,7 @@ def create_empty_handle(vis_graph_list, npixel, cellsize, frequency, channel_ban
                                                                        polarisation_frame=PolarisationFrame("stokesI")
                                                                        )))
 
-def invert_handle(sc, template_model_graph, vis_graph_list, context, dopsf, normalize, facets, vis_slices, **kwargs):
+def invert_handle(template_model_graph, vis_graph_list, context, dopsf, normalize, facets, vis_slices, **kwargs):
     c = imaging_context(context)
     image_metadata = template_model_graph.mapValues(lambda im: (im.wcs, im.polarisation_frame, im.shape))
     if context == "2d":
@@ -539,4 +658,94 @@ def sum_inver_image_reduce_kernel(im_sumwt1, im_sumwt2):
             total_sumwt += sumwt
     return (ret_im, total_sumwt)
 
+def zero_vis_kernel(vis):
+    id, v = vis
+    zerovis = None
+    if v is not None:
+        zerovis = copy_visibility(v)
+        zerovis.data['vis'][...] = 0.0
+    return (id, zerovis)
+
+def subtract_handle(viss, model_viss):
+    return viss.join(model_viss).mapValues(subtract_kernel)
+
+def subtract_kernel(ixs):
+    vis, model_vis = ixs
+    if vis is not None and model_vis is not None:
+        assert vis.vis.shape == model_vis.vis.shape
+        subvis = copy_visibility(vis)
+        subvis.data['vis'][...] -= model_vis.data['vis'][...]
+        return subvis
+    else:
+        return None
+
+def divide_handle(viss, model_viss):
+    return viss.join(model_viss).mapValues(divide_kernel)
+
+def divide_kernel(ixs):
+    vis, model_vis = ixs
+    return divide_visibility(vis, model_vis)
+
+def apply_gain_handle(viss, gt):
+    return viss.mapValues(lambda v: apply_gaintable(v, gt, inverse=True))
+
+def solve_and_apply_handle(viss, model_viss, **kwargs):
+    return viss.join(model_viss).mapValues(lambda ixs: solve_and_apply_kernel(ixs, **kwargs))
+
+def solve_and_apply_kernel(ixs, **kwargs):
+    vis, model_vis = ixs
+    gt = solve_gaintable(vis, model_vis, **kwargs)
+    return apply_gaintable(vis, gt, inverse=True, **kwargs)
+
+def deconvolve_handle(dirty_graph, psf_graph, model_graph, **kwargs):
+    return dirty_graph.join(psf_graph).join(model_graph).mapValues(lambda ixs: deconvolve_kernel(ixs, **kwargs))
+
+def deconvolve_kernel(ixs, **kwargs):
+    (dirty, psf), model = ixs
+    result = deconvolve_cube(dirty[0], psf[0], **kwargs)
+    result[0].data += model.data
+    return result[0]
+
+def restore_handle(deconvolve_model_graph, psf_graph, residual_graph, **kwargs):
+    return deconvolve_model_graph.join(psf_graph).join(residual_graph).mapValues(lambda ixs: restore_kernel(ixs, **kwargs))
+
+def restore_kernel(ixs, **kwargs):
+    (model, psf), residual = ixs
+    return restore_cube(model, psf[0], residual[0], **kwargs)
+
+def deconvolve_by_facet_handle(dirty_graph, psf_graph, model_graph, facets=1, **kwargs):
+    image_metadata = model_graph.mapValues(lambda im: (im.wcs, im.polarisation_frame, im.shape))
+
+    dirty_graphs = dirty_graph.mapValues(lambda im: im[0]).flatMap(lambda im: scatter_image_flatmap(im, facets=facets, image_iter=image_raster_iter, change_key=True, **kwargs))
+    psf_graphs = psf_graph.mapValues(lambda im: im[0]).flatMap(lambda im: scatter_image_flatmap(im, facets=facets, image_iter=image_raster_iter, change_key=True, **kwargs))
+    model_graphs = model_graph.flatMap(lambda im: scatter_image_flatmap(im, facets=facets, image_iter=image_raster_iter, change_key=True, **kwargs))
+    return dirty_graphs.join(psf_graphs).join(model_graphs).mapValues(lambda ixs: deconvolve_by_facet_kernel(ixs, **kwargs))\
+    .map(lambda idx: ((idx[0][0], idx[0][1], idx[0][2], idx[0][3], 0, idx[0][4]), idx[1])).groupByKey().join(image_metadata).mapValues(lambda idx: gather_deconvolved_image_kernel(idx, facets, **kwargs))
+
+def deconvolve_by_facet_kernel(ixs, **kwargs):
+    (dirty, psf), model = ixs
+    id = dirty.facet_id
+    assert isinstance(dirty, Image)
+    assert isinstance(psf, Image)
+    assert isinstance(model, Image)
+    comp = deconvolve_cube(dirty, psf, **kwargs)
+    comp[0].data += model.data
+    comp[0].facet_id = id
+    return comp[0]
+
+def gather_deconvolved_image_kernel(datas, facets, **kwargs):
+    data, image_metadata = datas
+    dic = {}
+    for im in data:
+        dic[im.facet_id] = im
+
+    wcs, polarisation_frame, shape = image_metadata
+    result = create_image_from_array(np.empty(shape), wcs=wcs, polarisation_frame=polarisation_frame)
+    i = 0
+    for dpatch in image_raster_iter(result, facets=facets, **kwargs):
+        assert i < len(data), "Too few results in gather_image_iteration_results"
+        dpatch.data[...] = dic[i].data[...]
+        i += 1
+
+    return result
 

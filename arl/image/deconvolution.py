@@ -93,7 +93,7 @@ def deconvolve_cube(dirty: Image, psf: Image, **kwargs) -> (Image, Image):
             psf.data = psf.data[..., (centre[0] - psf_support):(centre[0] + psf_support),
                                 (centre[1] - psf_support):(centre[1] + psf_support)]
             log.info('deconvolve_cube: PSF support = +/- %d pixels' % (psf_support))
-    
+
     algorithm = get_parameter(kwargs, 'algorithm', 'msclean')
     
     if algorithm == 'msclean':
@@ -107,7 +107,7 @@ def deconvolve_cube(dirty: Image, psf: Image, **kwargs) -> (Image, Image):
         scales = get_parameter(kwargs, 'scales', [0, 3, 10, 30])
         fracthresh = get_parameter(kwargs, 'fractional_threshold', 0.01)
         assert 0.0 < fracthresh < 1.0
-    
+
         comp_array = numpy.zeros_like(dirty.data)
         residual_array = numpy.zeros_like(dirty.data)
         for channel in range(dirty.data.shape[0]):
@@ -124,7 +124,7 @@ def deconvolve_cube(dirty: Image, psf: Image, **kwargs) -> (Image, Image):
                                     window[channel, pol, :, :], gain, thresh, niter, scales, fracthresh)
                 else:
                     log.info("deconvolve_cube: Skipping pol %d, channel %d" % (pol, channel))
-                    
+
         comp_image = create_image_from_array(comp_array, dirty.wcs, dirty.polarisation_frame)
         residual_image = create_image_from_array(residual_array, dirty.wcs, dirty.polarisation_frame)
 

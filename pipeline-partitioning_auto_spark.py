@@ -153,54 +153,102 @@ def trial_case(results, seed=180555, context='wstack', nworkers=8, threads_per_w
 
     model_graph.cache()
     model_graph.collect()
-    psf_graph = create_invert_graph(sc, vis_graph_list, model_graph, vis_slices=vis_slices, context=context, facets=facets,
-                                    dopsf=True, kernel=kernel)
 
+    # psf_graph = create_invert_graph(vis_graph_list, model_graph, vis_slices=vis_slices, context=context, facets=facets,
+    #                                 dopsf=True, kernel=kernel)
+    #
+    # start = time.time()
+    # print("****** Starting PSF calculation ******")
+    # psfs = psf_graph.collect()
+    # psf = None
+    # for i in psfs:
+    #     if i[0][2] == 0:
+    #         psf = i[1][0]
+    # end = time.time()
+    # results['time psf invert'] = end - start
+    # print("PSF invert took %.2f seconds" % (end - start))
+    #
+    # results['psf_max'] = qa_image(psf).data['max']
+    # results['psf_min'] = qa_image(psf).data['min']
+    #
+    # print(results['psf_max'])
+    # print(results['psf_min'])
+    #
+    #
+    # dirty_graph = create_invert_graph(vis_graph_list, model_graph, vis_slices=vis_slices, context=context, facets=facets,
+    #                                 kernel=kernel)
+    #
+    # start = time.time()
+    # print("****** Starting dirty image calculation ******")
+    # dirtys  = dirty_graph.collect()
+    # dirty, sumwt = (None, None)
+    # for i in dirtys:
+    #     if i[0][2] == 0:
+    #         dirty, sumwt = i[1]
+    #
+    # print(psf.shape)
+    # print(dirty.shape)
+    # end = time.time()
+    # results['time invert'] = end - start
+    # print("Dirty image invert took %.2f seconds" % (end - start))
+    # print("Maximum in dirty image is ", numpy.max(numpy.abs(dirty.data)), ", sumwt is ", sumwt)
+    # qa = qa_image(dirty)
+    # results['dirty_max'] = qa.data['max']
+    # results['dirty_min'] = qa.data['min']
+    #
+    # start = time.time()
+    # print("***** write data to file *****")
+    # export_images_to_fits(psfs, nfreqwin, "psf.fits")
+    # export_images_to_fits(dirtys, nfreqwin, "dirty.fits")
+    # end = time.time()
+    # results['time write'] = end - start
+
+    print("****** Starting ICAL ******")
     start = time.time()
-    print("****** Starting PSF calculation ******")
-    psfs = psf_graph.collect()
-    psf = None
-    for i in psfs:
+    residual_graph, deconvolve_graph, restore_graph = create_ical_graph(sc, vis_graph_list, model_graph, nchan=nfreqwin, context=context, vis_slices=vis_slices,
+                                   facets=facets, first_selfcal=1, algorithm='msclean', nmoments=3, niter=1000,
+                                   fractional_threshold=0.1, scales=[0, 3, 10], threshold=0.1, nmajor=2, gain=0.7,
+                                   timeslice='auto', global_solution=True, window_shape='quarter')
+    residual_graph.cache()
+    residuals = residual_graph.collect()
+    deconvolve_graph.cache()
+    deconvolveds = deconvolve_graph.collect()
+    restore_graph.cache()
+    restores = restore_graph.collect()
+
+    end = time.time()
+    results['time ICAL'] = end - start
+    print("ICAL graph execution took %.2f seconds" % (end - start))
+
+    residual = None
+    for i in residuals:
         if i[0][2] == 0:
-            psf = i[1][0]
-    end = time.time()
-    results['time psf invert'] = end - start
-    print("PSF invert took %.2f seconds" % (end - start))
+            residual = i[1][0]
+    print(residual)
+    qa = qa_image(residual)
+    results['residual_max'] = qa.data['max']
+    results['residual_min'] = qa.data['min']
+    export_images_to_fits(residuals, nfreqwin, "pipelines-timings-delayed-ical_residual.fits")
 
-    results['psf_max'] = qa_image(psf).data['max']
-    results['psf_min'] = qa_image(psf).data['min']
-
-    print(results['psf_max'])
-    print(results['psf_min'])
-
-
-    dirty_graph = create_invert_graph(sc, vis_graph_list, model_graph, vis_slices=vis_slices, context=context, facets=facets,
-                                    kernel=kernel)
-
-    start = time.time()
-    print("****** Starting dirty image calculation ******")
-    dirtys  = dirty_graph.collect()
-    dirty, sumwt = (None, None)
-    for i in dirtys:
+    deconvolve = None
+    for i in deconvolveds:
         if i[0][2] == 0:
-            dirty, sumwt = i[1]
+            deconvolve = i[1]
+    print(deconvolve)
+    qa = qa_image(deconvolve)
+    results['deconvolved_max'] = qa.data['max']
+    results['deconvolved_min'] = qa.data['min']
+    export_images_to_fits(deconvolveds, nfreqwin, "pipelines-timings-delayed-deconvolved.fits", has_sumwt=False)
 
-    print(psf.shape)
-    print(dirty.shape)
-    end = time.time()
-    results['time invert'] = end - start
-    print("Dirty image invert took %.2f seconds" % (end - start))
-    print("Maximum in dirty image is ", numpy.max(numpy.abs(dirty.data)), ", sumwt is ", sumwt)
-    qa = qa_image(dirty)
-    results['dirty_max'] = qa.data['max']
-    results['dirty_min'] = qa.data['min']
-
-    start = time.time()
-    print("***** write data to file *****")
-    export_images_to_fits(psfs, nfreqwin, "psf.fits")
-    export_images_to_fits(dirtys, nfreqwin, "dirty.fits")
-    end = time.time()
-    results['time write'] = end - start 
+    restore = None
+    for i in restores:
+        if i[0][2] == 0:
+            restore = i[1]
+    print(restore)
+    qa = qa_image(restore)
+    results['restored_max'] = qa.data['max']
+    results['restored_min'] = qa.data['min']
+    export_images_to_fits(restores, nfreqwin, "pipelines-timings-delayed-restored.fits", has_sumwt=False)
 
 
 
@@ -288,7 +336,7 @@ def main(args):
                   'deconvolved_min', 'restored_min', 'restored_max', 'residual_max', 'residual_min',
                   'hostname', 'git_hash', 'epoch', 'context']
 
-    filename = seqfile.findNextFile(folder="./csv_spark", prefix='%s_%s_' % (results['driver'], results['hostname']), suffix='.csv')
+    filename = seqfile.findNextFile(folder="./develop_csv", prefix='%s_%s_' % (results['driver'], results['hostname']), suffix='.csv')
     print('Saving results to %s' % filename)
 
     write_header(filename, fieldnames)

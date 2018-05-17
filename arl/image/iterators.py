@@ -24,7 +24,7 @@ def image_null_iter(im: Image, **kwargs) -> numpy.ndarray:
     yield im
 
 
-def image_raster_iter(im: Image, **kwargs) -> Image:
+def image_raster_iter(im: Image, **kwargs):
     """Create an image_raster_iter generator, returning images, optionally with overlaps
 
     The WCS is adjusted appropriately for each raster element. Hence this is a coordinate-aware
