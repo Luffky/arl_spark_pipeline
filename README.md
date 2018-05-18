@@ -6,3 +6,5 @@
 2018 5.5 add experimental results -- test_plus_spark.xlsx
 
 2018 5.17 finish ICAL pipeline basically
+
+2018 5.18 finish ICAL pipeline completely (all tests passed)
