@@ -1,5 +1,5 @@
 from collections import defaultdict
-from pyspark import SparkContext, SparkFiles
+from pyspark import SparkContext
 from astropy.wcs import WCS
 from arl.image.operations import create_image_from_array, create_empty_image_like
 from arl.image.gather_scatter import *
@@ -10,7 +10,6 @@ from arl.imaging.base import create_image_from_visibility, normalize_sumwt
 from arl.visibility.coalesce import *
 from arl.visibility.base import *
 from arl.visibility.operations import divide_visibility, integrate_visibility_by_channel
-from arl.calibration.operations import append_gaintable
 from arl.calibration.solvers import solve_gaintable
 from astropy import units as u
 from arl.calibration.solvers import create_gaintable_from_blockvisibility
@@ -193,7 +192,7 @@ def create_ical_graph(sc, vis_graph_list, model_graph, nchan, context="2d", vis_
     psf_graph = create_invert_graph(vis_graph_list, model_graph, vis_slices=vis_slices, context=context,
                                     facets=facets,
                                     dopsf=True)
-
+    psf_graph.cache()
     if first_selfcal is not None and first_selfcal == 0:
         model_vis_graph_list = create_zero_vis_graph(vis_graph_list)
         model_vis_graph_list = create_predict_graph(model_vis_graph_list, model_graph, vis_slices=vis_slices, facets=facets,
@@ -206,25 +205,33 @@ def create_ical_graph(sc, vis_graph_list, model_graph, nchan, context="2d", vis_
         residual_graph = create_residual_graph(vis_graph_list, model_graph, context=context, vis_slices=vis_slices, facets=facets, nchan=nchan, **kwargs)
 
 
-    # deconvolve_model_graph = create_deconvolve_graph(sc, residual_graph, psf_graph, model_graph, nchan=nchan, **kwargs)
-    deconvolve_model_graph = create_deconvolve_facet_graph(residual_graph, psf_graph, model_graph, facets=2, **kwargs)
+    deconvolve_model_graph = create_deconvolve_graph(sc, residual_graph, psf_graph, model_graph, nchan=nchan, **kwargs)
 
-    # nmajor = get_parameter(kwargs, "nmajor", 5)
-    # if nmajor > 1:
-    #     for cycle in range(nmajor):
-    #         if first_selfcal is not None and cycle >= first_selfcal:
-    #             model_vis_graph_list = create_zero_vis_graph(vis_graph_list)
-    #             model_vis_graph_list = create_predict_graph(model_vis_graph_list, deconvolve_model_graph, vis_slices=vis_slices, facets=facets,
-    #                                                     context=context, nfrequency=nchan, **kwargs)
-    #             vis_graph_list = create_calibrate_graph_list(vis_graph_list, model_vis_graph_list, **kwargs)
-    #             residual_vis_graph_list = create_subtract_vis_graph_list(vis_graph_list, model_vis_graph_list)
-    #             residual_graph = create_invert_graph(residual_vis_graph_list, model_graph, dopsf=False, context=context, vis_slices=vis_slices, facets=facets, **kwargs)
-    #
-    #         else:
-    #             residual_graph = create_residual_graph(vis_graph_list, deconvolve_model_graph, context=context, vis_slices=vis_slices, facets=facets, nchan=nchan, **kwargs)
-    #
-    #         deconvolve_model_graph = create_deconvolve_graph(sc, residual_graph, psf_graph, deconvolve_model_graph, nchan=nchan, **kwargs)
+    # deconvolve by facets optional
+    # deconvolve_model_graph = create_deconvolve_facet_graph(residual_graph, psf_graph, model_graph, facets=facets, **kwargs)
+
+    nmajor = get_parameter(kwargs, "nmajor", 5)
+    if nmajor > 1:
+        for cycle in range(nmajor):
+            if first_selfcal is not None and cycle >= first_selfcal:
+                model_vis_graph_list = create_zero_vis_graph(vis_graph_list)
+                model_vis_graph_list = create_predict_graph(model_vis_graph_list, deconvolve_model_graph, vis_slices=vis_slices, facets=facets,
+                                                        context=context, nfrequency=nchan, **kwargs)
+                vis_graph_list = create_calibrate_graph_list(vis_graph_list, model_vis_graph_list, **kwargs)
+                residual_vis_graph_list = create_subtract_vis_graph_list(vis_graph_list, model_vis_graph_list)
+                residual_graph = create_invert_graph(residual_vis_graph_list, model_graph, dopsf=False, context=context, vis_slices=vis_slices, facets=facets, **kwargs)
+
+            else:
+                residual_graph = create_residual_graph(vis_graph_list, deconvolve_model_graph, context=context, vis_slices=vis_slices, facets=facets, nchan=nchan, **kwargs)
+
+            deconvolve_model_graph = create_deconvolve_graph(sc, residual_graph, psf_graph, deconvolve_model_graph, nchan=nchan, **kwargs)
+            # deconvolve by facets optional
+            # deconvolve_model_graph = create_deconvolve_facet_graph(residual_graph, psf_graph, model_graph, facets=facets, **kwargs)
+
+    # cache防止重复计算
+    deconvolve_model_graph.cache()
     residual_graph = create_residual_graph(vis_graph_list, deconvolve_model_graph, context=context, vis_slices=vis_slices, facets=facets, nchan=nchan, **kwargs)
+    residual_graph.cache()
 
     restore_graph = create_restore_graph(deconvolve_model_graph, psf_graph, residual_graph, **kwargs)
     return residual_graph, deconvolve_model_graph, restore_graph
@@ -465,7 +472,7 @@ def scatter_image_flatmap(ixs, facets, image_iter, change_key=False, **kwargs):
         subim.facet_id = id
         id += 1
         if change_key:
-            ret.append((iix[0], iix[1], iix[2], iix[3], id, iix[5], subim))
+            ret.append(((iix[0], iix[1], iix[2], iix[3], id, iix[5]), subim))
         else:
             ret.append((iix, subim))
     return iter(ret)
@@ -719,10 +726,12 @@ def deconvolve_by_facet_handle(dirty_graph, psf_graph, model_graph, facets=1, **
     dirty_graphs = dirty_graph.mapValues(lambda im: im[0]).flatMap(lambda im: scatter_image_flatmap(im, facets=facets, image_iter=image_raster_iter, change_key=True, **kwargs))
     psf_graphs = psf_graph.mapValues(lambda im: im[0]).flatMap(lambda im: scatter_image_flatmap(im, facets=facets, image_iter=image_raster_iter, change_key=True, **kwargs))
     model_graphs = model_graph.flatMap(lambda im: scatter_image_flatmap(im, facets=facets, image_iter=image_raster_iter, change_key=True, **kwargs))
+
     return dirty_graphs.join(psf_graphs).join(model_graphs).mapValues(lambda ixs: deconvolve_by_facet_kernel(ixs, **kwargs))\
-    .map(lambda idx: ((idx[0][0], idx[0][1], idx[0][2], idx[0][3], 0, idx[0][4]), idx[1])).groupByKey().join(image_metadata).mapValues(lambda idx: gather_deconvolved_image_kernel(idx, facets, **kwargs))
+    .map(lambda idx: ((idx[0][0], idx[0][1], idx[0][2], idx[0][3], 0, idx[0][5]), idx[1])).groupByKey().join(image_metadata).mapValues(lambda idx: gather_deconvolved_image_kernel(idx, facets, **kwargs))
 
 def deconvolve_by_facet_kernel(ixs, **kwargs):
+    print(ixs)
     (dirty, psf), model = ixs
     id = dirty.facet_id
     assert isinstance(dirty, Image)

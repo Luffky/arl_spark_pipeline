@@ -1,7 +1,5 @@
 import socket
 import time
-import numpy as np
-import os
 import sys
 from arl.imaging import advise_wide_field
 from arl.image.operations import qa_image, export_images_to_fits
@@ -154,54 +152,54 @@ def trial_case(results, seed=180555, context='wstack', nworkers=8, threads_per_w
     model_graph.cache()
     model_graph.collect()
 
-    # psf_graph = create_invert_graph(vis_graph_list, model_graph, vis_slices=vis_slices, context=context, facets=facets,
-    #                                 dopsf=True, kernel=kernel)
-    #
-    # start = time.time()
-    # print("****** Starting PSF calculation ******")
-    # psfs = psf_graph.collect()
-    # psf = None
-    # for i in psfs:
-    #     if i[0][2] == 0:
-    #         psf = i[1][0]
-    # end = time.time()
-    # results['time psf invert'] = end - start
-    # print("PSF invert took %.2f seconds" % (end - start))
-    #
-    # results['psf_max'] = qa_image(psf).data['max']
-    # results['psf_min'] = qa_image(psf).data['min']
-    #
-    # print(results['psf_max'])
-    # print(results['psf_min'])
-    #
-    #
-    # dirty_graph = create_invert_graph(vis_graph_list, model_graph, vis_slices=vis_slices, context=context, facets=facets,
-    #                                 kernel=kernel)
-    #
-    # start = time.time()
-    # print("****** Starting dirty image calculation ******")
-    # dirtys  = dirty_graph.collect()
-    # dirty, sumwt = (None, None)
-    # for i in dirtys:
-    #     if i[0][2] == 0:
-    #         dirty, sumwt = i[1]
-    #
-    # print(psf.shape)
-    # print(dirty.shape)
-    # end = time.time()
-    # results['time invert'] = end - start
-    # print("Dirty image invert took %.2f seconds" % (end - start))
-    # print("Maximum in dirty image is ", numpy.max(numpy.abs(dirty.data)), ", sumwt is ", sumwt)
-    # qa = qa_image(dirty)
-    # results['dirty_max'] = qa.data['max']
-    # results['dirty_min'] = qa.data['min']
-    #
-    # start = time.time()
-    # print("***** write data to file *****")
-    # export_images_to_fits(psfs, nfreqwin, "psf.fits")
-    # export_images_to_fits(dirtys, nfreqwin, "dirty.fits")
-    # end = time.time()
-    # results['time write'] = end - start
+    psf_graph = create_invert_graph(vis_graph_list, model_graph, vis_slices=vis_slices, context=context, facets=facets,
+                                    dopsf=True, kernel=kernel)
+
+    start = time.time()
+    print("****** Starting PSF calculation ******")
+    psfs = psf_graph.collect()
+    psf = None
+    for i in psfs:
+        if i[0][2] == 0:
+            psf = i[1][0]
+    end = time.time()
+    results['time psf invert'] = end - start
+    print("PSF invert took %.2f seconds" % (end - start))
+
+    results['psf_max'] = qa_image(psf).data['max']
+    results['psf_min'] = qa_image(psf).data['min']
+
+    print(results['psf_max'])
+    print(results['psf_min'])
+
+
+    dirty_graph = create_invert_graph(vis_graph_list, model_graph, vis_slices=vis_slices, context=context, facets=facets,
+                                    kernel=kernel)
+
+    start = time.time()
+    print("****** Starting dirty image calculation ******")
+    dirtys  = dirty_graph.collect()
+    dirty, sumwt = (None, None)
+    for i in dirtys:
+        if i[0][2] == 0:
+            dirty, sumwt = i[1]
+
+    print(psf.shape)
+    print(dirty.shape)
+    end = time.time()
+    results['time invert'] = end - start
+    print("Dirty image invert took %.2f seconds" % (end - start))
+    print("Maximum in dirty image is ", numpy.max(numpy.abs(dirty.data)), ", sumwt is ", sumwt)
+    qa = qa_image(dirty)
+    results['dirty_max'] = qa.data['max']
+    results['dirty_min'] = qa.data['min']
+
+    start = time.time()
+    print("***** write data to file *****")
+    export_images_to_fits(psfs, nfreqwin, "psf.fits")
+    export_images_to_fits(dirtys, nfreqwin, "dirty.fits")
+    end = time.time()
+    results['time write'] = end - start
 
     print("****** Starting ICAL ******")
     start = time.time()
@@ -209,11 +207,9 @@ def trial_case(results, seed=180555, context='wstack', nworkers=8, threads_per_w
                                    facets=facets, first_selfcal=1, algorithm='msclean', nmoments=3, niter=1000,
                                    fractional_threshold=0.1, scales=[0, 3, 10], threshold=0.1, nmajor=2, gain=0.7,
                                    timeslice='auto', global_solution=True, window_shape='quarter')
-    residual_graph.cache()
-    residuals = residual_graph.collect()
-    deconvolve_graph.cache()
+
     deconvolveds = deconvolve_graph.collect()
-    restore_graph.cache()
+    residuals = residual_graph.collect()
     restores = restore_graph.collect()
 
     end = time.time()
