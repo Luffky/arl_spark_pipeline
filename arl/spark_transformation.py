@@ -25,6 +25,7 @@ from arl.visibility.base import create_blockvisibility, create_visibility
 from arl.util.testing_support import create_named_configuration, simulate_gaintable, create_low_test_image_from_gleam
 
 log = logging.getLogger(__name__)
+parallelism = 16
 
 def MapPartitioner(partitions):
     def _inter(key):
@@ -193,6 +194,7 @@ def create_ical_graph(sc, vis_graph_list, model_graph, nchan, context="2d", vis_
                                     facets=facets,
                                     dopsf=True)
     psf_graph.cache()
+
     if first_selfcal is not None and first_selfcal == 0:
         model_vis_graph_list = create_zero_vis_graph(vis_graph_list)
         model_vis_graph_list = create_predict_graph(model_vis_graph_list, model_graph, vis_slices=vis_slices, facets=facets,
@@ -436,7 +438,7 @@ def degrid_handle(reppre_ifft, telescope_data, context, vis_slices, facets, nfre
     c = imaging_context(context)
     if context == "2d":
         telescope_data = telescope_data.mapValues(lambda vis: coalesce_visibility(vis, **kwargs))
-        return reppre_ifft.join(telescope_data).map(lambda record: degrid_kernel(record, c["predict"], context=context, **kwargs))
+        return reppre_ifft.join(telescope_data, parallelism).map(lambda record: degrid_kernel(record, c["predict"], context=context, **kwargs))
 
     elif context == "facets":
         telescope_data = telescope_data.mapValues(lambda vis: coalesce_visibility(vis, **kwargs))
@@ -557,7 +559,7 @@ def invert_handle(template_model_graph, vis_graph_list, context, dopsf, normaliz
     image_metadata = template_model_graph.mapValues(lambda im: (im.wcs, im.polarisation_frame, im.shape))
     if context == "2d":
         visibility = vis_graph_list.mapValues(lambda vis: coalesce_visibility(vis, **kwargs))
-        return template_model_graph.join(visibility).map(lambda record: invert_kernel(record, c["invert"], dopsf, normalize, context, **kwargs))
+        return template_model_graph.join(visibility, parallelism).map(lambda record: invert_kernel(record, c["invert"], dopsf, normalize, context, **kwargs))
     elif context == "facets":
         visibility = vis_graph_list.mapValues(lambda vis: coalesce_visibility(vis, **kwargs))
         return template_model_graph.flatMap(lambda im: scatter_image_flatmap(im, facets=facets, image_iter=c["image_iterator"], **kwargs), True)\
@@ -674,7 +676,7 @@ def zero_vis_kernel(vis):
     return (id, zerovis)
 
 def subtract_handle(viss, model_viss):
-    return viss.join(model_viss).mapValues(subtract_kernel)
+    return viss.join(model_viss, parallelism).mapValues(subtract_kernel)
 
 def subtract_kernel(ixs):
     vis, model_vis = ixs
@@ -687,7 +689,7 @@ def subtract_kernel(ixs):
         return None
 
 def divide_handle(viss, model_viss):
-    return viss.join(model_viss).mapValues(divide_kernel)
+    return viss.join(model_viss, parallelism).mapValues(divide_kernel)
 
 def divide_kernel(ixs):
     vis, model_vis = ixs
@@ -697,7 +699,7 @@ def apply_gain_handle(viss, gt):
     return viss.mapValues(lambda v: apply_gaintable(v, gt, inverse=True))
 
 def solve_and_apply_handle(viss, model_viss, **kwargs):
-    return viss.join(model_viss).mapValues(lambda ixs: solve_and_apply_kernel(ixs, **kwargs))
+    return viss.join(model_viss, parallelism).mapValues(lambda ixs: solve_and_apply_kernel(ixs, **kwargs))
 
 def solve_and_apply_kernel(ixs, **kwargs):
     vis, model_vis = ixs
@@ -705,7 +707,7 @@ def solve_and_apply_kernel(ixs, **kwargs):
     return apply_gaintable(vis, gt, inverse=True, **kwargs)
 
 def deconvolve_handle(dirty_graph, psf_graph, model_graph, **kwargs):
-    return dirty_graph.join(psf_graph).join(model_graph).mapValues(lambda ixs: deconvolve_kernel(ixs, **kwargs))
+    return dirty_graph.join(psf_graph, parallelism).join(model_graph, parallelism).mapValues(lambda ixs: deconvolve_kernel(ixs, **kwargs))
 
 def deconvolve_kernel(ixs, **kwargs):
     (dirty, psf), model = ixs
@@ -714,7 +716,7 @@ def deconvolve_kernel(ixs, **kwargs):
     return result[0]
 
 def restore_handle(deconvolve_model_graph, psf_graph, residual_graph, **kwargs):
-    return deconvolve_model_graph.join(psf_graph).join(residual_graph).mapValues(lambda ixs: restore_kernel(ixs, **kwargs))
+    return deconvolve_model_graph.join(psf_graph, parallelism).join(residual_graph, parallelism).mapValues(lambda ixs: restore_kernel(ixs, **kwargs))
 
 def restore_kernel(ixs, **kwargs):
     (model, psf), residual = ixs
