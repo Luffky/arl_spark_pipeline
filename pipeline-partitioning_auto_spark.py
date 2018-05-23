@@ -26,8 +26,12 @@ def git_hash():
 
 def trial_case(results, seed=180555, context='wstack', nworkers=8, threads_per_worker=1,
                processes=True, order='frequency', nfreqwin=7, ntimes=3, rmax=750.0,
-               facets=1, wprojection_planes=1):
+               facets=1, wprojection_planes=1, parallelism=16):
     npol = 1
+
+    if parallelism == -1:
+        parallelism = None
+
     np.random.seed(seed)
     results['seed'] = seed
 
@@ -201,12 +205,12 @@ def trial_case(results, seed=180555, context='wstack', nworkers=8, threads_per_w
     # end = time.time()
     # results['time write'] = end - start
 
-    print("****** Starting ICAL ******")
+    print("****** Starting ICAL ******" + " parallelism = " + str(parallelism))
     start = time.time()
     residual_graph, deconvolve_graph, restore_graph = create_ical_graph(sc, vis_graph_list, model_graph, nchan=nfreqwin, context=context, vis_slices=vis_slices,
                                    facets=facets, first_selfcal=1, algorithm='msclean', nmoments=3, niter=1000,
                                    fractional_threshold=0.1, scales=[0, 3, 10], threshold=0.1, nmajor=5, gain=0.7,
-                                   timeslice='auto', global_solution=True, window_shape='quarter')
+                                   timeslice='auto', global_solution=True, window_shape='quarter', parallelism=parallelism)
 
     deconvolveds = deconvolve_graph.collect()
     residuals = residual_graph.collect()
@@ -315,6 +319,8 @@ def main(args):
 
     nfacets = args.nfacets
 
+    parallelism = args.parallelism
+
     results['hostname'] = socket.gethostname()
     results['epoch'] = time.strftime("%Y-%m-%d %H:%M:%S")
     results['driver'] = 'pipelines-timings-delayed'
@@ -339,7 +345,7 @@ def main(args):
     write_header(filename, fieldnames)
 
     results = trial_case(results, nworkers=nworkers, rmax=rmax, context=context,
-                         threads_per_worker=threads_per_worker, nfreqwin=nfreqwin, ntimes=ntimes, facets=nfacets)
+                         threads_per_worker=threads_per_worker, nfreqwin=nfreqwin, ntimes=ntimes, facets=nfacets, parallelism=parallelism)
     write_results(filename, fieldnames, results)
 
     print('Exiting %s' % results['driver'])
@@ -361,6 +367,7 @@ if __name__ == '__main__':
     parser.add_argument('--context', type=str, default='2d',
                         help='Imaging context: 2d|timeslice|timeslice|wstack|facets_slice|facets|facets_timeslice|facets_wstack')
     parser.add_argument('--rmax', type=float, default=200.0, help='Maximum baseline (m)')
+    parser.add_argument("--parallelism", type=int, default=-1, help="parallelism, if equals -1, Spark Driver will decide num of parallelism automatically")
 
     main(parser.parse_args())
 
