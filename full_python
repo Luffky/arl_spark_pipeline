@@ -1,0 +1,145 @@
+Using 1 workers
+Using 1 threads per worker
+Trying 1 workers
+Using 1 threads per worker
+Defining 512 frequency windows
+Saving results to ./develop_csv/pipelines-timings-delayed_ITCT_14.csv
+Context is 2d
+At start, configuration is {'ntimes': 7, 'facets': 1, 'seed': 180555, 'driver': 'pipelines-timings-delayed', 'nfreqwin': 512, 'nworkers': 1, 'threads_per_worker': 1, 'nnodes': 1, 'context': '2d', 'processes': True, 'wprojection_planes': 1, 'rmax': 200.0, 'order': 'frequency', 'git_hash': b'0a71f5357fe8b2ec7d18e20d4d3a11c4e7d234d4\n', 'epoch': '2018-11-10 14:43:37', 'hostname': 'ITCT'}
+18/11/10 14:43:38 INFO SparkContext: Running Spark version 2.0.0
+18/11/10 14:43:38 WARN NativeCodeLoader: Unable to load native-hadoop library for your platform... using builtin-java classes where applicable
+18/11/10 14:43:38 WARN Utils: Your hostname, ITCT resolves to a loopback address: 127.0.1.1; using 192.168.0.101 instead (on interface eno2)
+18/11/10 14:43:38 WARN Utils: Set SPARK_LOCAL_IP if you need to bind to another address
+18/11/10 14:43:38 INFO SecurityManager: Changing view acls to: itct
+18/11/10 14:43:38 INFO SecurityManager: Changing modify acls to: itct
+18/11/10 14:43:38 INFO SecurityManager: Changing view acls groups to: 
+18/11/10 14:43:38 INFO SecurityManager: Changing modify acls groups to: 
+18/11/10 14:43:38 INFO SecurityManager: SecurityManager: authentication disabled; ui acls disabled; users  with view permissions: Set(itct); groups with view permissions: Set(); users  with modify permissions: Set(itct); groups with modify permissions: Set()
+18/11/10 14:43:39 INFO Utils: Successfully started service 'sparkDriver' on port 41378.
+18/11/10 14:43:39 INFO SparkEnv: Registering MapOutputTracker
+18/11/10 14:43:39 INFO SparkEnv: Registering BlockManagerMaster
+18/11/10 14:43:39 INFO DiskBlockManager: Created local directory at /tmp/blockmgr-ba81d72a-1136-4724-b39c-4b69305bc908
+18/11/10 14:43:39 INFO MemoryStore: MemoryStore started with capacity 978.3 MB
+18/11/10 14:43:39 INFO SparkEnv: Registering OutputCommitCoordinator
+18/11/10 14:43:39 WARN Utils: Service 'SparkUI' could not bind on port 8080. Attempting port 8081.
+18/11/10 14:43:39 INFO Utils: Successfully started service 'SparkUI' on port 8081.
+18/11/10 14:43:39 INFO SparkUI: Bound SparkUI to 0.0.0.0, and started at http://192.168.0.101:8081
+18/11/10 14:43:39 INFO Utils: Copying /home/itct/fukaiyu/arl_spark_v0.3/algorithm-reference-library-master/sc512 to /tmp/spark-d3040d0a-caed-49a6-8824-e6090bae5f10/userFiles-c3fb99ae-be18-4e61-8bbe-10201d0e6ae0/sc512
+18/11/10 14:43:39 INFO SparkContext: Added file file:/home/itct/fukaiyu/arl_spark_v0.3/algorithm-reference-library-master/sc512 at spark://192.168.0.101:41378/files/sc512 with timestamp 1541832219597
+18/11/10 14:43:39 INFO Utils: Copying /home/itct/fukaiyu/arl_spark_v0.3/algorithm-reference-library-master/LOWBD2.csv to /tmp/spark-d3040d0a-caed-49a6-8824-e6090bae5f10/userFiles-c3fb99ae-be18-4e61-8bbe-10201d0e6ae0/LOWBD2.csv
+18/11/10 14:43:39 INFO SparkContext: Added file file:/home/itct/fukaiyu/arl_spark_v0.3/algorithm-reference-library-master/LOWBD2.csv at spark://192.168.0.101:41378/files/LOWBD2.csv with timestamp 1541832219613
+18/11/10 14:43:39 INFO Utils: Copying /home/itct/fukaiyu/arl_spark_v0.3/algorithm-reference-library-master/SKA1_LOW_beam.fits to /tmp/spark-d3040d0a-caed-49a6-8824-e6090bae5f10/userFiles-c3fb99ae-be18-4e61-8bbe-10201d0e6ae0/SKA1_LOW_beam.fits
+18/11/10 14:43:39 INFO SparkContext: Added file file:/home/itct/fukaiyu/arl_spark_v0.3/algorithm-reference-library-master/SKA1_LOW_beam.fits at spark://192.168.0.101:41378/files/SKA1_LOW_beam.fits with timestamp 1541832219616
+18/11/10 14:43:39 INFO Utils: Copying /home/itct/fukaiyu/arl_spark_v0.3/algorithm-reference-library-master/pipeline-partitioning_auto_spark.py to /tmp/spark-d3040d0a-caed-49a6-8824-e6090bae5f10/userFiles-c3fb99ae-be18-4e61-8bbe-10201d0e6ae0/pipeline-partitioning_auto_spark.py
+18/11/10 14:43:39 INFO SparkContext: Added file file:/home/itct/fukaiyu/arl_spark_v0.3/algorithm-reference-library-master/pipeline-partitioning_auto_spark.py at spark://192.168.0.101:41378/files/pipeline-partitioning_auto_spark.py with timestamp 1541832219619
+18/11/10 14:43:39 INFO Utils: Copying /home/itct/fukaiyu/arl_spark_v0.3/algorithm-reference-library-master/arl.zip to /tmp/spark-d3040d0a-caed-49a6-8824-e6090bae5f10/userFiles-c3fb99ae-be18-4e61-8bbe-10201d0e6ae0/arl.zip
+18/11/10 14:43:39 INFO SparkContext: Added file file:/home/itct/fukaiyu/arl_spark_v0.3/algorithm-reference-library-master/arl.zip at spark://192.168.0.101:41378/files/arl.zip with timestamp 1541832219625
+18/11/10 14:43:39 INFO StandaloneAppClient$ClientEndpoint: Connecting to master spark://192.168.0.101:7077...
+18/11/10 14:43:39 INFO TransportClientFactory: Successfully created connection to /192.168.0.101:7077 after 33 ms (0 ms spent in bootstraps)
+18/11/10 14:43:39 INFO StandaloneSchedulerBackend: Connected to Spark cluster with app ID app-20181110144339-0018
+18/11/10 14:43:39 INFO TaskSchedulerImpl: Starting speculative execution thread
+18/11/10 14:43:39 INFO StandaloneAppClient$ClientEndpoint: Executor added: app-20181110144339-0018/0 on worker-20181108142353-192.168.0.112-40873 (192.168.0.112:40873) with 4 cores
+18/11/10 14:43:39 INFO StandaloneSchedulerBackend: Granted executor ID app-20181110144339-0018/0 on hostPort 192.168.0.112:40873 with 4 cores, 2.0 GB RAM
+18/11/10 14:43:39 INFO StandaloneAppClient$ClientEndpoint: Executor added: app-20181110144339-0018/1 on worker-20181108142353-192.168.0.112-40873 (192.168.0.112:40873) with 4 cores
+18/11/10 14:43:39 INFO StandaloneSchedulerBackend: Granted executor ID app-20181110144339-0018/1 on hostPort 192.168.0.112:40873 with 4 cores, 2.0 GB RAM
+18/11/10 14:43:39 INFO StandaloneAppClient$ClientEndpoint: Executor added: app-20181110144339-0018/2 on worker-20181108142353-192.168.0.112-40873 (192.168.0.112:40873) with 4 cores
+18/11/10 14:43:39 INFO StandaloneSchedulerBackend: Granted executor ID app-20181110144339-0018/2 on hostPort 192.168.0.112:40873 with 4 cores, 2.0 GB RAM
+18/11/10 14:43:39 INFO StandaloneAppClient$ClientEndpoint: Executor added: app-20181110144339-0018/3 on worker-20181108142353-192.168.0.112-40873 (192.168.0.112:40873) with 4 cores
+18/11/10 14:43:39 INFO StandaloneSchedulerBackend: Granted executor ID app-20181110144339-0018/3 on hostPort 192.168.0.112:40873 with 4 cores, 2.0 GB RAM
+18/11/10 14:43:39 INFO Utils: Successfully started service 'org.apache.spark.network.netty.NettyBlockTransferService' on port 34240.
+18/11/10 14:43:39 INFO NettyBlockTransferService: Server created on 192.168.0.101:34240
+18/11/10 14:43:39 INFO StandaloneAppClient$ClientEndpoint: Executor added: app-20181110144339-0018/4 on worker-20181108142353-192.168.0.112-40873 (192.168.0.112:40873) with 4 cores
+18/11/10 14:43:39 INFO StandaloneSchedulerBackend: Granted executor ID app-20181110144339-0018/4 on hostPort 192.168.0.112:40873 with 4 cores, 2.0 GB RAM
+18/11/10 14:43:39 INFO StandaloneAppClient$ClientEndpoint: Executor added: app-20181110144339-0018/5 on worker-20181108142353-192.168.0.112-40873 (192.168.0.112:40873) with 4 cores
+18/11/10 14:43:39 INFO StandaloneSchedulerBackend: Granted executor ID app-20181110144339-0018/5 on hostPort 192.168.0.112:40873 with 4 cores, 2.0 GB RAM
+18/11/10 14:43:39 INFO BlockManagerMaster: Registering BlockManager BlockManagerId(driver, 192.168.0.101, 34240)
+18/11/10 14:43:39 INFO StandaloneAppClient$ClientEndpoint: Executor added: app-20181110144339-0018/6 on worker-20181101161029-192.168.0.101-36972 (192.168.0.101:36972) with 4 cores
+18/11/10 14:43:39 INFO StandaloneSchedulerBackend: Granted executor ID app-20181110144339-0018/6 on hostPort 192.168.0.101:36972 with 4 cores, 2.0 GB RAM
+18/11/10 14:43:39 INFO BlockManagerMasterEndpoint: Registering block manager 192.168.0.101:34240 with 978.3 MB RAM, BlockManagerId(driver, 192.168.0.101, 34240)
+18/11/10 14:43:39 INFO StandaloneAppClient$ClientEndpoint: Executor added: app-20181110144339-0018/7 on worker-20181101161029-192.168.0.101-36972 (192.168.0.101:36972) with 4 cores
+18/11/10 14:43:39 INFO StandaloneSchedulerBackend: Granted executor ID app-20181110144339-0018/7 on hostPort 192.168.0.101:36972 with 4 cores, 2.0 GB RAM
+18/11/10 14:43:39 INFO StandaloneAppClient$ClientEndpoint: Executor added: app-20181110144339-0018/8 on worker-20181101161029-192.168.0.101-36972 (192.168.0.101:36972) with 4 cores
+18/11/10 14:43:39 INFO StandaloneSchedulerBackend: Granted executor ID app-20181110144339-0018/8 on hostPort 192.168.0.101:36972 with 4 cores, 2.0 GB RAM
+18/11/10 14:43:39 INFO BlockManagerMaster: Registered BlockManager BlockManagerId(driver, 192.168.0.101, 34240)
+18/11/10 14:43:39 INFO StandaloneAppClient$ClientEndpoint: Executor updated: app-20181110144339-0018/6 is now RUNNING
+18/11/10 14:43:39 INFO StandaloneAppClient$ClientEndpoint: Executor updated: app-20181110144339-0018/0 is now RUNNING
+18/11/10 14:43:39 INFO StandaloneAppClient$ClientEndpoint: Executor updated: app-20181110144339-0018/1 is now RUNNING
+18/11/10 14:43:39 INFO StandaloneAppClient$ClientEndpoint: Executor updated: app-20181110144339-0018/7 is now RUNNING
+18/11/10 14:43:39 INFO StandaloneAppClient$ClientEndpoint: Executor updated: app-20181110144339-0018/2 is now RUNNING
+18/11/10 14:43:39 INFO StandaloneAppClient$ClientEndpoint: Executor updated: app-20181110144339-0018/8 is now RUNNING
+18/11/10 14:43:39 INFO StandaloneAppClient$ClientEndpoint: Executor updated: app-20181110144339-0018/3 is now RUNNING
+18/11/10 14:43:39 INFO StandaloneAppClient$ClientEndpoint: Executor updated: app-20181110144339-0018/4 is now RUNNING
+18/11/10 14:43:39 INFO StandaloneAppClient$ClientEndpoint: Executor updated: app-20181110144339-0018/5 is now RUNNING
+18/11/10 14:43:40 INFO EventLoggingListener: Logging events to file:/home/itct/fukaiyu/uilog/app-20181110144339-0018.lz4
+18/11/10 14:43:40 INFO StandaloneSchedulerBackend: SchedulerBackend is ready for scheduling beginning after reached minRegisteredResourcesRatio: 0.0
+****** Visibility creation ******
+18/11/10 14:43:41 INFO SparkContext: Starting job: collect at /home/itct/fukaiyu/arl_spark_v0.3/algorithm-reference-library-master/pipeline-partitioning_auto_spark.py:83
+18/11/10 14:43:41 INFO DAGScheduler: Registering RDD 2 (partitionBy at /home/itct/fukaiyu/arl_spark_v0.3/algorithm-reference-library-master/arl/spark_transformation.py:284)
+18/11/10 14:43:41 INFO DAGScheduler: Registering RDD 6 (partitionBy at /home/itct/fukaiyu/arl_spark_v0.3/algorithm-reference-library-master/arl/spark_transformation.py:338)
+18/11/10 14:43:41 INFO DAGScheduler: Got job 0 (collect at /home/itct/fukaiyu/arl_spark_v0.3/algorithm-reference-library-master/pipeline-partitioning_auto_spark.py:83) with 512 output partitions
+18/11/10 14:43:41 INFO DAGScheduler: Final stage: ResultStage 2 (collect at /home/itct/fukaiyu/arl_spark_v0.3/algorithm-reference-library-master/pipeline-partitioning_auto_spark.py:83)
+18/11/10 14:43:41 INFO DAGScheduler: Parents of final stage: List(ShuffleMapStage 1)
+18/11/10 14:43:41 INFO DAGScheduler: Missing parents: List(ShuffleMapStage 1)
+18/11/10 14:43:41 INFO DAGScheduler: Submitting ShuffleMapStage 0 (PairwiseRDD[2] at partitionBy at /home/itct/fukaiyu/arl_spark_v0.3/algorithm-reference-library-master/arl/spark_transformation.py:284), which has no missing parents
+18/11/10 14:43:42 INFO MemoryStore: Block broadcast_0 stored as values in memory (estimated size 6.3 KB, free 978.3 MB)
+18/11/10 14:43:42 INFO MemoryStore: Block broadcast_0_piece0 stored as bytes in memory (estimated size 4.2 KB, free 978.3 MB)
+18/11/10 14:43:42 INFO BlockManagerInfo: Added broadcast_0_piece0 in memory on 192.168.0.101:34240 (size: 4.2 KB, free: 978.3 MB)
+18/11/10 14:43:42 INFO SparkContext: Created broadcast 0 from broadcast at DAGScheduler.scala:1012
+18/11/10 14:43:42 INFO DAGScheduler: Submitting 2 missing tasks from ShuffleMapStage 0 (PairwiseRDD[2] at partitionBy at /home/itct/fukaiyu/arl_spark_v0.3/algorithm-reference-library-master/arl/spark_transformation.py:284)
+18/11/10 14:43:42 INFO TaskSchedulerImpl: Adding task set 0.0 with 2 tasks
+18/11/10 14:43:42 INFO CoarseGrainedSchedulerBackend$DriverEndpoint: Registered executor NettyRpcEndpointRef(null) (192.168.0.112:34900) with ID 4
+18/11/10 14:43:42 INFO BlockManagerMasterEndpoint: Registering block manager 192.168.0.112:43012 with 978.3 MB RAM, BlockManagerId(4, 192.168.0.112, 43012)
+18/11/10 14:43:42 INFO TaskSetManager: Starting task 0.0 in stage 0.0 (TID 0, 192.168.0.112, partition 0, PROCESS_LOCAL, 5668 bytes)
+18/11/10 14:43:42 INFO TaskSetManager: Starting task 1.0 in stage 0.0 (TID 1, 192.168.0.112, partition 1, PROCESS_LOCAL, 5682 bytes)
+18/11/10 14:43:42 INFO CoarseGrainedSchedulerBackend$DriverEndpoint: Launching task 0 on executor id: 4 hostname: 192.168.0.112.
+18/11/10 14:43:42 INFO CoarseGrainedSchedulerBackend$DriverEndpoint: Launching task 1 on executor id: 4 hostname: 192.168.0.112.
+18/11/10 14:43:42 INFO CoarseGrainedSchedulerBackend$DriverEndpoint: Registered executor NettyRpcEndpointRef(null) (192.168.0.112:34902) with ID 3
+18/11/10 14:43:42 INFO CoarseGrainedSchedulerBackend$DriverEndpoint: Registered executor NettyRpcEndpointRef(null) (192.168.0.112:34904) with ID 0
+18/11/10 14:43:42 INFO CoarseGrainedSchedulerBackend$DriverEndpoint: Registered executor NettyRpcEndpointRef(null) (192.168.0.112:34910) with ID 2
+18/11/10 14:43:42 INFO CoarseGrainedSchedulerBackend$DriverEndpoint: Registered executor NettyRpcEndpointRef(null) (192.168.0.112:34906) with ID 1
+18/11/10 14:43:42 INFO CoarseGrainedSchedulerBackend$DriverEndpoint: Registered executor NettyRpcEndpointRef(null) (192.168.0.112:34908) with ID 5
+18/11/10 14:43:42 INFO BlockManagerMasterEndpoint: Registering block manager 192.168.0.112:32976 with 978.3 MB RAM, BlockManagerId(3, 192.168.0.112, 32976)
+18/11/10 14:43:42 INFO BlockManagerMasterEndpoint: Registering block manager 192.168.0.112:43294 with 978.3 MB RAM, BlockManagerId(0, 192.168.0.112, 43294)
+18/11/10 14:43:42 INFO BlockManagerMasterEndpoint: Registering block manager 192.168.0.112:39215 with 978.3 MB RAM, BlockManagerId(1, 192.168.0.112, 39215)
+18/11/10 14:43:42 INFO BlockManagerMasterEndpoint: Registering block manager 192.168.0.112:33758 with 978.3 MB RAM, BlockManagerId(2, 192.168.0.112, 33758)
+18/11/10 14:43:42 INFO BlockManagerMasterEndpoint: Registering block manager 192.168.0.112:44925 with 978.3 MB RAM, BlockManagerId(5, 192.168.0.112, 44925)
+18/11/10 14:43:42 INFO BlockManagerInfo: Added broadcast_0_piece0 in memory on 192.168.0.112:43012 (size: 4.2 KB, free: 978.3 MB)
+18/11/10 14:43:43 INFO CoarseGrainedSchedulerBackend$DriverEndpoint: Registered executor NettyRpcEndpointRef(null) (192.168.0.101:47068) with ID 7
+18/11/10 14:43:43 INFO BlockManagerMasterEndpoint: Registering block manager 192.168.0.101:36417 with 978.3 MB RAM, BlockManagerId(7, 192.168.0.101, 36417)
+18/11/10 14:43:43 INFO CoarseGrainedSchedulerBackend$DriverEndpoint: Registered executor NettyRpcEndpointRef(null) (192.168.0.101:47070) with ID 6
+18/11/10 14:43:43 INFO CoarseGrainedSchedulerBackend$DriverEndpoint: Registered executor NettyRpcEndpointRef(null) (192.168.0.101:47072) with ID 8
+18/11/10 14:43:43 INFO BlockManagerMasterEndpoint: Registering block manager 192.168.0.101:42842 with 978.3 MB RAM, BlockManagerId(6, 192.168.0.101, 42842)
+18/11/10 14:43:43 INFO BlockManagerMasterEndpoint: Registering block manager 192.168.0.101:35905 with 978.3 MB RAM, BlockManagerId(8, 192.168.0.101, 35905)
+Traceback (most recent call last):
+  File "/home/itct/fukaiyu/arl_spark_v0.3/algorithm-reference-library-master/pipeline-partitioning_auto_spark.py", line 370, in <module>
+    main(parser.parse_args())
+  File "/home/itct/fukaiyu/arl_spark_v0.3/algorithm-reference-library-master/pipeline-partitioning_auto_spark.py", line 346, in main
+    threads_per_worker=threads_per_worker, nfreqwin=nfreqwin, ntimes=ntimes, facets=nfacets, parallelism=parallelism)
+  File "/home/itct/fukaiyu/arl_spark_v0.3/algorithm-reference-library-master/pipeline-partitioning_auto_spark.py", line 83, in trial_case
+    for v in vis_graph_list.collect():
+  File "/home/itct/spark-2.0.0-bin-hadoop2.7/python/lib/pyspark.zip/pyspark/rdd.py", line 776, in collect
+  File "/home/itct/spark-2.0.0-bin-hadoop2.7/python/lib/py4j-0.10.1-src.zip/py4j/java_gateway.py", line 931, in __call__
+  File "/home/itct/spark-2.0.0-bin-hadoop2.7/python/lib/py4j-0.10.1-src.zip/py4j/java_gateway.py", line 695, in send_command
+  File "/home/itct/spark-2.0.0-bin-hadoop2.7/python/lib/py4j-0.10.1-src.zip/py4j/java_gateway.py", line 828, in send_command
+  File "/usr/lib/python3.5/socket.py", line 575, in readinto
+18/11/10 14:43:43 INFO SparkContext: Invoking stop() from shutdown hook
+    return self._sock.recv_into(b)
+  File "/home/itct/spark-2.0.0-bin-hadoop2.7/python/lib/pyspark.zip/pyspark/context.py", line 223, in signal_handler
+KeyboardInterrupt
+18/11/10 14:43:43 INFO TaskSchedulerImpl: Cancelling stage 0
+18/11/10 14:43:43 INFO TaskSchedulerImpl: Stage 0 was cancelled
+18/11/10 14:43:43 INFO SparkUI: Stopped Spark web UI at http://192.168.0.101:8081
+18/11/10 14:43:43 INFO DAGScheduler: ShuffleMapStage 0 (partitionBy at /home/itct/fukaiyu/arl_spark_v0.3/algorithm-reference-library-master/arl/spark_transformation.py:284) failed in 1.236 s
+18/11/10 14:43:43 INFO DAGScheduler: Job 0 failed: collect at /home/itct/fukaiyu/arl_spark_v0.3/algorithm-reference-library-master/pipeline-partitioning_auto_spark.py:83, took 2.140610 s
+18/11/10 14:43:43 ERROR LiveListenerBus: SparkListenerBus has already stopped! Dropping event SparkListenerJobEnd(0,1541832223405,JobFailed(org.apache.spark.SparkException: Job 0 cancelled as part of cancellation of all jobs))
+18/11/10 14:43:43 INFO StandaloneSchedulerBackend: Shutting down all executors
+18/11/10 14:43:43 INFO CoarseGrainedSchedulerBackend$DriverEndpoint: Asking each executor to shut down
+18/11/10 14:43:43 INFO MapOutputTrackerMasterEndpoint: MapOutputTrackerMasterEndpoint stopped!
+18/11/10 14:43:43 INFO MemoryStore: MemoryStore cleared
+18/11/10 14:43:43 INFO BlockManager: BlockManager stopped
+18/11/10 14:43:43 INFO BlockManagerMaster: BlockManagerMaster stopped
+18/11/10 14:43:43 INFO OutputCommitCoordinator$OutputCommitCoordinatorEndpoint: OutputCommitCoordinator stopped!
+18/11/10 14:43:43 INFO SparkContext: Successfully stopped SparkContext
+18/11/10 14:43:43 INFO ShutdownHookManager: Shutdown hook called
+18/11/10 14:43:43 INFO ShutdownHookManager: Deleting directory /tmp/spark-d3040d0a-caed-49a6-8824-e6090bae5f10
+18/11/10 14:43:43 INFO ShutdownHookManager: Deleting directory /tmp/spark-d3040d0a-caed-49a6-8824-e6090bae5f10/pyspark-9afcd24b-03cf-454b-803f-ef69e2ea2510

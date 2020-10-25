@@ -1,0 +1,720 @@
+(0, 0, 13, 0, 0, 0)
+Quality assessment:
+	Origin: qa_image
+	Context: 
+	Data:
+		sum: -1.20783634397448
+		rms: 0.012328332628914628
+		medianabs: 0.005776616096581984
+		max: 0.9999213152637864
+		min: -0.02112601053168641
+		shape: (1, 1, 256, 256)
+		median: -0.001047340948518618
+Quality assessment:
+	Origin: qa_image
+	Context: 
+	Data:
+		sum: -1.20783634397448
+		rms: 0.012328332628914628
+		medianabs: 0.005776616096581984
+		max: 0.9999213152637864
+		min: -0.02112601053168641
+		shape: (1, 1, 256, 256)
+		median: -0.001047340948518618
+Quality assessment:
+	Origin: qa_image
+	Context: 
+	Data:
+		sum: 0.0
+		rms: 0.0
+		medianabs: 0.0
+		max: 0.0
+		min: 0.0
+		shape: (1, 1, 256, 256)
+		median: 0.0
+Quality assessment:
+	Origin: qa_image
+	Context: 
+	Data:
+		sum: 0.9429309117884895
+		rms: 0.0024002421158566996
+		medianabs: 0.0
+		max: 0.592211120877073
+		min: -0.00905501957993105
+		shape: (1, 1, 256, 256)
+		median: 0.0
+(0, 0, 9, 0, 0, 0)
+Quality assessment:
+	Origin: qa_image
+	Context: 
+	Data:
+		sum: 1.5641778081122397
+		rms: 0.013023489595749347
+		medianabs: 0.0057891471044797995
+		max: 0.9999225918913741
+		min: -0.021146744564692448
+		shape: (1, 1, 256, 256)
+		median: -0.0010498705944567864
+Quality assessment:
+	Origin: qa_image
+	Context: 
+	Data:
+		sum: 1.5641778081122397
+		rms: 0.013023489595749347
+		medianabs: 0.0057891471044797995
+		max: 0.9999225918913741
+		min: -0.021146744564692448
+		shape: (1, 1, 256, 256)
+		median: -0.0010498705944567864
+Quality assessment:
+	Origin: qa_image
+	Context: 
+	Data:
+		sum: 0.0
+		rms: 0.0
+		medianabs: 0.0
+		max: 0.0
+		min: 0.0
+		shape: (1, 1, 256, 256)
+		median: 0.0
+Quality assessment:
+	Origin: qa_image
+	Context: 
+	Data:
+		sum: 1.0200655049755203
+		rms: 0.0022527443778805932
+		medianabs: 0.0
+		max: 0.5495845917532123
+		min: -0.007104294558032165
+		shape: (1, 1, 256, 256)
+		median: 0.0
+(0, 0, 5, 0, 0, 0)
+Quality assessment:
+	Origin: qa_image
+	Context: 
+	Data:
+		sum: -2.1898740222521456
+		rms: 0.013792549933992525
+		medianabs: 0.005720783940870754
+		max: 0.9999224466855187
+		min: -0.02120168349299102
+		shape: (1, 1, 256, 256)
+		median: -0.001087685527813309
+Quality assessment:
+	Origin: qa_image
+	Context: 
+	Data:
+		sum: -2.1898740222521456
+		rms: 0.013792549933992525
+		medianabs: 0.005720783940870754
+		max: 0.9999224466855187
+		min: -0.02120168349299102
+		shape: (1, 1, 256, 256)
+		median: -0.001087685527813309
+Quality assessment:
+	Origin: qa_image
+	Context: 
+	Data:
+		sum: 0.0
+		rms: 0.0
+		medianabs: 0.0
+		max: 0.0
+		min: 0.0
+		shape: (1, 1, 256, 256)
+		median: 0.0
+Quality assessment:
+	Origin: qa_image
+	Context: 
+	Data:
+		sum: 1.0787571825436695
+		rms: 0.002072308368960368
+		medianabs: 0.0
+		max: 0.500133929945255
+		min: -0.005451035032941855
+		shape: (1, 1, 256, 256)
+		median: 0.0
+(0, 0, 1, 0, 0, 0)
+Quality assessment:
+	Origin: qa_image
+	Context: 
+	Data:
+		sum: 0.5730408897156001
+		rms: 0.014936107854359067
+		medianabs: 0.005680672518665001
+		max: 0.9999228187349584
+		min: -0.02117041626881105
+		shape: (1, 1, 256, 256)
+		median: -0.0011034638647127687
+Quality assessment:
+	Origin: qa_image
+	Context: 
+	Data:
+		sum: 0.5730408897156001
+		rms: 0.014936107854359067
+		medianabs: 0.005680672518665001
+		max: 0.9999228187349584
+		min: -0.02117041626881105
+		shape: (1, 1, 256, 256)
+		median: -0.0011034638647127687
+Quality assessment:
+	Origin: qa_image
+	Context: 
+	Data:
+		sum: 0.0
+		rms: 0.0
+		medianabs: 0.0
+		max: 0.0
+		min: 0.0
+		shape: (1, 1, 256, 256)
+		median: 0.0
+Quality assessment:
+	Origin: qa_image
+	Context: 
+	Data:
+		sum: 1.0362328734820843
+		rms: 0.0015475391224646893
+		medianabs: 0.0
+		max: 0.3422729650881491
+		min: -0.006424939410820915
+		shape: (1, 1, 256, 256)
+		median: 0.0
+(0, 0, 14, 0, 0, 0)
+Quality assessment:
+	Origin: qa_image
+	Context: 
+	Data:
+		sum: 0.18852610513696733
+		rms: 0.012173777865439538
+		medianabs: 0.005796775046030687
+		max: 0.9999234566111859
+		min: -0.021070262545882505
+		shape: (1, 1, 256, 256)
+		median: -0.0010481602752507402
+Quality assessment:
+	Origin: qa_image
+	Context: 
+	Data:
+		sum: 0.18852610513696733
+		rms: 0.012173777865439538
+		medianabs: 0.005796775046030687
+		max: 0.9999234566111859
+		min: -0.021070262545882505
+		shape: (1, 1, 256, 256)
+		median: -0.0010481602752507402
+Quality assessment:
+	Origin: qa_image
+	Context: 
+	Data:
+		sum: 0.0
+		rms: 0.0
+		medianabs: 0.0
+		max: 0.0
+		min: 0.0
+		shape: (1, 1, 256, 256)
+		median: 0.0
+Quality assessment:
+	Origin: qa_image
+	Context: 
+	Data:
+		sum: 1.0180795098958557
+		rms: 0.0024563213818514355
+		medianabs: 0.0
+		max: 0.6074639847921015
+		min: -0.007831724220968457
+		shape: (1, 1, 256, 256)
+		median: 0.0
+(0, 0, 10, 0, 0, 0)
+Quality assessment:
+	Origin: qa_image
+	Context: 
+	Data:
+		sum: -0.46479985909825605
+		rms: 0.012814019304629434
+		medianabs: 0.005780601895915267
+		max: 0.9999238217385686
+		min: -0.02103824092524765
+		shape: (1, 1, 256, 256)
+		median: -0.0010698235295756755
+Quality assessment:
+	Origin: qa_image
+	Context: 
+	Data:
+		sum: -0.46479985909825605
+		rms: 0.012814019304629434
+		medianabs: 0.005780601895915267
+		max: 0.9999238217385686
+		min: -0.02103824092524765
+		shape: (1, 1, 256, 256)
+		median: -0.0010698235295756755
+Quality assessment:
+	Origin: qa_image
+	Context: 
+	Data:
+		sum: 0.0
+		rms: 0.0
+		medianabs: 0.0
+		max: 0.0
+		min: 0.0
+		shape: (1, 1, 256, 256)
+		median: 0.0
+Quality assessment:
+	Origin: qa_image
+	Context: 
+	Data:
+		sum: 1.0099654203523558
+		rms: 0.0022868206095668403
+		medianabs: 0.0
+		max: 0.5586755687126522
+		min: -0.007430280060483154
+		shape: (1, 1, 256, 256)
+		median: 0.0
+(0, 0, 6, 0, 0, 0)
+Quality assessment:
+	Origin: qa_image
+	Context: 
+	Data:
+		sum: -1.454815409201406
+		rms: 0.013592856090074651
+		medianabs: 0.0057432262521417195
+		max: 0.9999217528187779
+		min: -0.0215174726234987
+		shape: (1, 1, 256, 256)
+		median: -0.0010579322519699164
+Quality assessment:
+	Origin: qa_image
+	Context: 
+	Data:
+		sum: -1.454815409201406
+		rms: 0.013592856090074651
+		medianabs: 0.0057432262521417195
+		max: 0.9999217528187779
+		min: -0.0215174726234987
+		shape: (1, 1, 256, 256)
+		median: -0.0010579322519699164
+Quality assessment:
+	Origin: qa_image
+	Context: 
+	Data:
+		sum: 0.0
+		rms: 0.0
+		medianabs: 0.0
+		max: 0.0
+		min: 0.0
+		shape: (1, 1, 256, 256)
+		median: 0.0
+Quality assessment:
+	Origin: qa_image
+	Context: 
+	Data:
+		sum: 1.0223725983960967
+		rms: 0.002131193580855346
+		medianabs: 0.0
+		max: 0.5143920735844973
+		min: -0.007864330748820461
+		shape: (1, 1, 256, 256)
+		median: 0.0
+(0, 0, 2, 0, 0, 0)
+Quality assessment:
+	Origin: qa_image
+	Context: 
+	Data:
+		sum: -2.148238910345344
+		rms: 0.01461824384178282
+		medianabs: 0.005710620780269197
+		max: 0.999925348672551
+		min: -0.021338603152374166
+		shape: (1, 1, 256, 256)
+		median: -0.0011388641748018655
+Quality assessment:
+	Origin: qa_image
+	Context: 
+	Data:
+		sum: -2.148238910345344
+		rms: 0.01461824384178282
+		medianabs: 0.005710620780269197
+		max: 0.999925348672551
+		min: -0.021338603152374166
+		shape: (1, 1, 256, 256)
+		median: -0.0011388641748018655
+Quality assessment:
+	Origin: qa_image
+	Context: 
+	Data:
+		sum: 0.0
+		rms: 0.0
+		medianabs: 0.0
+		max: 0.0
+		min: 0.0
+		shape: (1, 1, 256, 256)
+		median: 0.0
+Quality assessment:
+	Origin: qa_image
+	Context: 
+	Data:
+		sum: 1.0285438244767462
+		rms: 0.0018176334504902449
+		medianabs: 0.0
+		max: 0.42293034893443565
+		min: -0.007045740947121439
+		shape: (1, 1, 256, 256)
+		median: 0.0
+(0, 0, 15, 0, 0, 0)
+Quality assessment:
+	Origin: qa_image
+	Context: 
+	Data:
+		sum: 1.5250095410405617
+		rms: 0.012041077355274895
+		medianabs: 0.005778096274364376
+		max: 0.9999222176777997
+		min: -0.021312490080880406
+		shape: (1, 1, 256, 256)
+		median: -0.0009698887059590871
+Quality assessment:
+	Origin: qa_image
+	Context: 
+	Data:
+		sum: 1.5250095410405617
+		rms: 0.012041077355274895
+		medianabs: 0.005778096274364376
+		max: 0.9999222176777997
+		min: -0.021312490080880406
+		shape: (1, 1, 256, 256)
+		median: -0.0009698887059590871
+Quality assessment:
+	Origin: qa_image
+	Context: 
+	Data:
+		sum: 0.0
+		rms: 0.0
+		medianabs: 0.0
+		max: 0.0
+		min: 0.0
+		shape: (1, 1, 256, 256)
+		median: 0.0
+Quality assessment:
+	Origin: qa_image
+	Context: 
+	Data:
+		sum: 1.007734932297438
+		rms: 0.002488498471802904
+		medianabs: 0.0
+		max: 0.616075759885665
+		min: -0.008085219285672731
+		shape: (1, 1, 256, 256)
+		median: 0.0
+(0, 0, 11, 0, 0, 0)
+Quality assessment:
+	Origin: qa_image
+	Context: 
+	Data:
+		sum: 0.5611696521119989
+		rms: 0.012648916004696463
+		medianabs: 0.005782960042933423
+		max: 0.9999225651326248
+		min: -0.021316240238550572
+		shape: (1, 1, 256, 256)
+		median: -0.0010408148253220522
+Quality assessment:
+	Origin: qa_image
+	Context: 
+	Data:
+		sum: 0.5611696521119989
+		rms: 0.012648916004696463
+		medianabs: 0.005782960042933423
+		max: 0.9999225651326248
+		min: -0.021316240238550572
+		shape: (1, 1, 256, 256)
+		median: -0.0010408148253220522
+Quality assessment:
+	Origin: qa_image
+	Context: 
+	Data:
+		sum: 0.0
+		rms: 0.0
+		medianabs: 0.0
+		max: 0.0
+		min: 0.0
+		shape: (1, 1, 256, 256)
+		median: 0.0
+Quality assessment:
+	Origin: qa_image
+	Context: 
+	Data:
+		sum: 0.999226288963793
+		rms: 0.002313507038552906
+		medianabs: 0.0
+		max: 0.5664728334255917
+		min: -0.007537433149268349
+		shape: (1, 1, 256, 256)
+		median: 0.0
+(0, 0, 7, 0, 0, 0)
+Quality assessment:
+	Origin: qa_image
+	Context: 
+	Data:
+		sum: 1.5026460672314625
+		rms: 0.013404846541171269
+		medianabs: 0.005751680482899524
+		max: 0.999921916284767
+		min: -0.021210212963667836
+		shape: (1, 1, 256, 256)
+		median: -0.0010520675354890598
+Quality assessment:
+	Origin: qa_image
+	Context: 
+	Data:
+		sum: 1.5026460672314625
+		rms: 0.013404846541171269
+		medianabs: 0.005751680482899524
+		max: 0.999921916284767
+		min: -0.021210212963667836
+		shape: (1, 1, 256, 256)
+		median: -0.0010520675354890598
+Quality assessment:
+	Origin: qa_image
+	Context: 
+	Data:
+		sum: 0.0
+		rms: 0.0
+		medianabs: 0.0
+		max: 0.0
+		min: 0.0
+		shape: (1, 1, 256, 256)
+		median: 0.0
+Quality assessment:
+	Origin: qa_image
+	Context: 
+	Data:
+		sum: 1.0142433013503487
+		rms: 0.0021571672689703813
+		medianabs: 0.0
+		max: 0.5220730469561221
+		min: -0.00641831384198837
+		shape: (1, 1, 256, 256)
+		median: 0.0
+(0, 0, 3, 0, 0, 0)
+Quality assessment:
+	Origin: qa_image
+	Context: 
+	Data:
+		sum: -0.09670145894180454
+		rms: 0.014328763990826934
+		medianabs: 0.005713789238211201
+		max: 0.9999229233677241
+		min: -0.021374937763369944
+		shape: (1, 1, 256, 256)
+		median: -0.0011274029108840557
+Quality assessment:
+	Origin: qa_image
+	Context: 
+	Data:
+		sum: -0.09670145894180454
+		rms: 0.014328763990826934
+		medianabs: 0.005713789238211201
+		max: 0.9999229233677241
+		min: -0.021374937763369944
+		shape: (1, 1, 256, 256)
+		median: -0.0011274029108840557
+Quality assessment:
+	Origin: qa_image
+	Context: 
+	Data:
+		sum: 0.0
+		rms: 0.0
+		medianabs: 0.0
+		max: 0.0
+		min: 0.0
+		shape: (1, 1, 256, 256)
+		median: 0.0
+Quality assessment:
+	Origin: qa_image
+	Context: 
+	Data:
+		sum: 1.091328225730821
+		rms: 0.0020219539342285742
+		medianabs: 0.0
+		max: 0.4829731636716107
+		min: -0.006457425613263321
+		shape: (1, 1, 256, 256)
+		median: 0.0
+(0, 0, 12, 0, 0, 0)
+Quality assessment:
+	Origin: qa_image
+	Context: 
+	Data:
+		sum: 0.7859158437031779
+		rms: 0.012501240146076122
+		medianabs: 0.00580488012252667
+		max: 0.9999230557611027
+		min: -0.021326230313439016
+		shape: (1, 1, 256, 256)
+		median: -0.0010360705221183469
+Quality assessment:
+	Origin: qa_image
+	Context: 
+	Data:
+		sum: 0.7859158437031779
+		rms: 0.012501240146076122
+		medianabs: 0.00580488012252667
+		max: 0.9999230557611027
+		min: -0.021326230313439016
+		shape: (1, 1, 256, 256)
+		median: -0.0010360705221183469
+Quality assessment:
+	Origin: qa_image
+	Context: 
+	Data:
+		sum: 0.0
+		rms: 0.0
+		medianabs: 0.0
+		max: 0.0
+		min: 0.0
+		shape: (1, 1, 256, 256)
+		median: 0.0
+Quality assessment:
+	Origin: qa_image
+	Context: 
+	Data:
+		sum: 0.9883493818023392
+		rms: 0.002345552076709676
+		medianabs: 0.0
+		max: 0.5750733603846311
+		min: -0.007891293473526236
+		shape: (1, 1, 256, 256)
+		median: 0.0
+(0, 0, 8, 0, 0, 0)
+Quality assessment:
+	Origin: qa_image
+	Context: 
+	Data:
+		sum: 1.6506665817298574
+		rms: 0.013211762922757352
+		medianabs: 0.00578331292623847
+		max: 0.9999220556324989
+		min: -0.021112081895514848
+		shape: (1, 1, 256, 256)
+		median: -0.0010588275915067087
+Quality assessment:
+	Origin: qa_image
+	Context: 
+	Data:
+		sum: 1.6506665817298574
+		rms: 0.013211762922757352
+		medianabs: 0.00578331292623847
+		max: 0.9999220556324989
+		min: -0.021112081895514848
+		shape: (1, 1, 256, 256)
+		median: -0.0010588275915067087
+Quality assessment:
+	Origin: qa_image
+	Context: 
+	Data:
+		sum: 0.0
+		rms: 0.0
+		medianabs: 0.0
+		max: 0.0
+		min: 0.0
+		shape: (1, 1, 256, 256)
+		median: 0.0
+Quality assessment:
+	Origin: qa_image
+	Context: 
+	Data:
+		sum: 1.0301105066915555
+		rms: 0.0022266554361906163
+		medianabs: 0.0
+		max: 0.5416687769686789
+		min: -0.0061285372603853685
+		shape: (1, 1, 256, 256)
+		median: 0.0
+(0, 0, 4, 0, 0, 0)
+Quality assessment:
+	Origin: qa_image
+	Context: 
+	Data:
+		sum: -0.5637989329745537
+		rms: 0.014066956172334374
+		medianabs: 0.005731215748511193
+		max: 0.9999219404101604
+		min: -0.021191778774256362
+		shape: (1, 1, 256, 256)
+		median: -0.0010852470680314955
+Quality assessment:
+	Origin: qa_image
+	Context: 
+	Data:
+		sum: -0.5637989329745537
+		rms: 0.014066956172334374
+		medianabs: 0.005731215748511193
+		max: 0.9999219404101604
+		min: -0.021191778774256362
+		shape: (1, 1, 256, 256)
+		median: -0.0010852470680314955
+Quality assessment:
+	Origin: qa_image
+	Context: 
+	Data:
+		sum: 0.0
+		rms: 0.0
+		medianabs: 0.0
+		max: 0.0
+		min: 0.0
+		shape: (1, 1, 256, 256)
+		median: 0.0
+Quality assessment:
+	Origin: qa_image
+	Context: 
+	Data:
+		sum: 1.03607901671218
+		rms: 0.002053679720572554
+		medianabs: 0.0
+		max: 0.4945020711911244
+		min: -0.005730319139481668
+		shape: (1, 1, 256, 256)
+		median: 0.0
+(0, 0, 0, 0, 0, 0)
+Quality assessment:
+	Origin: qa_image
+	Context: 
+	Data:
+		sum: 3.798761807088887
+		rms: 0.015261228288060128
+		medianabs: 0.005697082381579091
+		max: 0.9999230958528873
+		min: -0.02143685995282364
+		shape: (1, 1, 256, 256)
+		median: -0.0010047828510423005
+Quality assessment:
+	Origin: qa_image
+	Context: 
+	Data:
+		sum: 3.798761807088887
+		rms: 0.015261228288060128
+		medianabs: 0.005697082381579091
+		max: 0.9999230958528873
+		min: -0.02143685995282364
+		shape: (1, 1, 256, 256)
+		median: -0.0010047828510423005
+Quality assessment:
+	Origin: qa_image
+	Context: 
+	Data:
+		sum: 0.0
+		rms: 0.0
+		medianabs: 0.0
+		max: 0.0
+		min: 0.0
+		shape: (1, 1, 256, 256)
+		median: 0.0
+Quality assessment:
+	Origin: qa_image
+	Context: 
+	Data:
+		sum: 1.0717841517103766
+		rms: 0.001544643986161897
+		medianabs: 0.0
+		max: 0.3375280404662157
+		min: -0.006233811205872944
+		shape: (1, 1, 256, 256)
+		median: 0.0

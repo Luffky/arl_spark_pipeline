@@ -1,6 +1,7 @@
 import socket
 import time
 import sys
+import os
 from arl.imaging import advise_wide_field
 from arl.image.operations import qa_image, export_images_to_fits
 from arl.spark_transformation import *
@@ -10,7 +11,7 @@ log = logging.getLogger()
 log.setLevel(logging.INFO)
 log.addHandler(logging.StreamHandler(sys.stdout))
 
-#os.environ["PYSPARK_PYTHON"]="/usr/local/bin/python3"
+os.environ["PYSPARK_PYTHON"]="/usr/local/bin/python3.7"
 def git_hash():
 
     """ Get the hash for this git repository.
@@ -26,8 +27,11 @@ def git_hash():
 
 def trial_case(results, seed=180555, context='wstack', nworkers=8, threads_per_worker=1,
                processes=True, order='frequency', nfreqwin=7, ntimes=3, rmax=750.0,
-               facets=1, wprojection_planes=1):
+               facets=1, wprojection_planes=1, parallelism=16):
     npol = 1
+
+    if parallelism == -1:
+        parallelism = None
     np.random.seed(seed)
     results['seed'] = seed
 
@@ -53,7 +57,7 @@ def trial_case(results, seed=180555, context='wstack', nworkers=8, threads_per_w
 
     print("At start, configuration is {0!r}".format(results))
 
-    conf = SparkConf().setMaster("local[4]")
+    conf = SparkConf()
     sc = SparkContext(conf=conf)
     sc.addFile("./LOWBD2.csv")
     sc.addFile("./sc16")
@@ -152,99 +156,107 @@ def trial_case(results, seed=180555, context='wstack', nworkers=8, threads_per_w
     model_graph.cache()
     model_graph.collect()
 
-    # psf_graph = create_invert_graph(vis_graph_list, model_graph, vis_slices=vis_slices, context=context, facets=facets,
-    #                                 dopsf=True, kernel=kernel)
-    #
-    # start = time.time()
-    # print("****** Starting PSF calculation ******")
-    # psfs = psf_graph.collect()
-    # psf = None
-    # for i in psfs:
-    #     if i[0][2] == 0:
-    #         psf = i[1][0]
-    # end = time.time()
-    # results['time psf invert'] = end - start
-    # print("PSF invert took %.2f seconds" % (end - start))
-    #
-    # results['psf_max'] = qa_image(psf).data['max']
-    # results['psf_min'] = qa_image(psf).data['min']
-    #
-    # print(results['psf_max'])
-    # print(results['psf_min'])
-    #
-    #
-    # dirty_graph = create_invert_graph(vis_graph_list, model_graph, vis_slices=vis_slices, context=context, facets=facets,
-    #                                 kernel=kernel)
-    #
-    # start = time.time()
-    # print("****** Starting dirty image calculation ******")
-    # dirtys  = dirty_graph.collect()
-    # dirty, sumwt = (None, None)
-    # for i in dirtys:
-    #     if i[0][2] == 0:
-    #         dirty, sumwt = i[1]
-    #
-    # print(psf.shape)
-    # print(dirty.shape)
-    # end = time.time()
-    # results['time invert'] = end - start
-    # print("Dirty image invert took %.2f seconds" % (end - start))
-    # print("Maximum in dirty image is ", numpy.max(numpy.abs(dirty.data)), ", sumwt is ", sumwt)
-    # qa = qa_image(dirty)
-    # results['dirty_max'] = qa.data['max']
-    # results['dirty_min'] = qa.data['min']
-    #
-    # start = time.time()
-    # print("***** write data to file *****")
-    # export_images_to_fits(psfs, nfreqwin, "psf.fits")
-    # export_images_to_fits(dirtys, nfreqwin, "dirty.fits")
-    # end = time.time()
-    # results['time write'] = end - start
-
-    print("****** Starting ICAL ******")
+    psf_graph = create_invert_graph(vis_graph_list, model_graph, vis_slices=vis_slices, context=context, facets=facets,
+                                    dopsf=True, kernel=kernel)
+    
     start = time.time()
-    residual_graph, deconvolve_graph, restore_graph = create_ical_graph(sc, vis_graph_list, model_graph, nchan=nfreqwin, context=context, vis_slices=vis_slices,
-                                   facets=facets, first_selfcal=1, algorithm='msclean', nmoments=3, niter=1000,
-                                   fractional_threshold=0.1, scales=[0, 3, 10], threshold=0.1, nmajor=5, gain=0.7,
-                                   timeslice='auto', global_solution=True, window_shape='quarter')
-
-    deconvolveds = deconvolve_graph.collect()
-    residuals = residual_graph.collect()
-    restores = restore_graph.collect()
-
+    print("****** Starting PSF calculation ******")
+    psfs = psf_graph.collect()
+    psf = None
+    for i in psfs:
+       if i[0][2] == 0:
+           psf = i[1][0]
     end = time.time()
-    results['time ICAL'] = end - start
-    print("ICAL graph execution took %.2f seconds" % (end - start))
+    results['time psf invert'] = end - start
+    print("PSF invert took %.2f seconds" % (end - start))
+    
+    results['psf_max'] = qa_image(psf).data['max']
+    results['psf_min'] = qa_image(psf).data['min']
+    
+    print(results['psf_max'])
+    print(results['psf_min'])
+   
+    dirty_graph = create_invert_graph(vis_graph_list, model_graph, vis_slices=vis_slices, context=context, facets=facets,
+                                  kernel=kernel)
+    
+    start = time.time()
+    print("****** Starting dirty image calculation ******")
+    dirtys  = dirty_graph.collect()
+    dirty, sumwt = (None, None)
+    for i in dirtys:
+       if i[0][2] == 0:
+           dirty, sumwt = i[1]
+    
+    print(psf.shape)
+    print(dirty.shape)
+    end = time.time()
+    results['time invert'] = end - start
+    print("Dirty image invert took %.2f seconds" % (end - start))
+    print("Maximum in dirty image is ", numpy.max(numpy.abs(dirty.data)), ", sumwt is ", sumwt)
+    qa = qa_image(dirty)
+    results['dirty_max'] = qa.data['max']
+    results['dirty_min'] = qa.data['min']
+    
+    start = time.time()
+    print("***** write data to file *****")
+    export_images_to_fits(psfs, nfreqwin, "psf.fits")
+    export_images_to_fits(dirtys, nfreqwin, "dirty.fits")
+    end = time.time()
+    results['time write'] = end - start
 
-    residual = None
-    for i in residuals:
-        if i[0][2] == 0:
-            residual = i[1][0]
-    print(residual)
-    qa = qa_image(residual)
-    results['residual_max'] = qa.data['max']
-    results['residual_min'] = qa.data['min']
-    export_images_to_fits(residuals, nfreqwin, "pipelines-timings-delayed-ical_residual.fits")
+    # print("****** Starting ICAL ******" + "parallelism = " + str(parallelism))
+    # start = time.time()
+    #
+    # residual_graph, deconvolve_graph, restore_graph = create_ical_graph(sc, vis_graph_list, model_graph, nchan=nfreqwin, context=context, vis_slices=vis_slices,
+    #                                facets=facets, first_selfcal=0, algorithm='msclean', nmoments=3, niter=1000,
+    #                                fractional_threshold=0.1, scales=[0, 3, 10], threshold=0.1, nmajor=1, gain=0.7,
+    #                                timeslice='auto', global_solution=True, window_shape='quarter', parallelism=parallelism)
+    #
+    # deconvolveds = deconvolve_graph.collect()
+    # residuals = residual_graph.collect()
+    # restores = restore_graph.collect()
+    #
+    # end = time.time()
+    # results['time ICAL'] = end - start
+    # print("ICAL graph execution took %.2f seconds" % (end - start))
+    
+    # with open("qa_image", "w") as f:
+    #     for idx, qas in deconvolveds:
+    #         f.write(str(idx) + "\n")
+    #         f.write(str(qas[1][0]))
+    #         f.write(str(qas[1][1]))
+    #         f.write(str(qas[1][2]))
+    #         f.write(str(qas[1][3]))
 
-    deconvolve = None
-    for i in deconvolveds:
-        if i[0][2] == 0:
-            deconvolve = i[1]
-    print(deconvolve)
-    qa = qa_image(deconvolve)
-    results['deconvolved_max'] = qa.data['max']
-    results['deconvolved_min'] = qa.data['min']
-    export_images_to_fits(deconvolveds, nfreqwin, "pipelines-timings-delayed-deconvolved.fits", has_sumwt=False)
-
-    restore = None
-    for i in restores:
-        if i[0][2] == 0:
-            restore = i[1]
-    print(restore)
-    qa = qa_image(restore)
-    results['restored_max'] = qa.data['max']
-    results['restored_min'] = qa.data['min']
-    export_images_to_fits(restores, nfreqwin, "pipelines-timings-delayed-restored.fits", has_sumwt=False)
+    # residual = None
+    # for i in residuals:
+    #    if i[0][2] == 0:
+    #        residual = i[1][0]
+    # print(residual)
+    # qa = qa_image(residual)
+    # results['residual_max'] = qa.data['max']
+    # results['residual_min'] = qa.data['min']
+    # export_images_to_fits(residuals, nfreqwin, "pipelines-timings-delayed-ical_residual.fits")
+    #
+    # deconvolve = None
+    # for i in deconvolveds:
+    #    if i[0][2] == 0:
+    #        deconvolve = i[1]
+    # print(deconvolve)
+    # qa = qa_image(deconvolve)
+    # results['deconvolved_max'] = qa.data['max']
+    # results['deconvolved_min'] = qa.data['min']
+    # export_images_to_fits(deconvolveds, nfreqwin, "pipelines-timings-delayed-deconvolved.fits", has_sumwt=False)
+    #
+    # restore = None
+    # for i in restores:
+    #    if i[0][2] == 0:
+    #        restore = i[1]
+    # print(restore)
+    # qa = qa_image(restore)
+    # results['restored_max'] = qa.data['max']
+    # results['restored_min'] = qa.data['min']
+    # export_images_to_fits(restores, nfreqwin, "pipelines-timings-delayed-restored.fits", has_sumwt=False)
 
 
 
@@ -314,6 +326,7 @@ def main(args):
     results['ntimes'] = ntimes
 
     nfacets = args.nfacets
+    parallelism = args.parallelism
 
     results['hostname'] = socket.gethostname()
     results['epoch'] = time.strftime("%Y-%m-%d %H:%M:%S")
@@ -339,7 +352,7 @@ def main(args):
     write_header(filename, fieldnames)
 
     results = trial_case(results, nworkers=nworkers, rmax=rmax, context=context,
-                         threads_per_worker=threads_per_worker, nfreqwin=nfreqwin, ntimes=ntimes, facets=nfacets)
+                         threads_per_worker=threads_per_worker, nfreqwin=nfreqwin, ntimes=ntimes, facets=nfacets, parallelism=parallelism)
     write_results(filename, fieldnames, results)
 
     print('Exiting %s' % results['driver'])
@@ -361,6 +374,7 @@ if __name__ == '__main__':
     parser.add_argument('--context', type=str, default='2d',
                         help='Imaging context: 2d|timeslice|timeslice|wstack|facets_slice|facets|facets_timeslice|facets_wstack')
     parser.add_argument('--rmax', type=float, default=200.0, help='Maximum baseline (m)')
+    parser.add_argument('--parallelism', type=int, default=-1, help='parallelism, if equals -1, Driver will decide num of it automatically')
 
     main(parser.parse_args())
 

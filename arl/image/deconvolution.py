@@ -113,7 +113,7 @@ def deconvolve_cube(dirty: Image, psf: Image, **kwargs) -> (Image, Image):
         for channel in range(dirty.data.shape[0]):
             for pol in range(dirty.data.shape[1]):
                 if psf.data[channel, pol, :, :].max():
-                    log.info("deconvolve_cube: Processing pol %d, channel %d" % (pol, channel))
+                    logging.warn("deconvolve_cube: Processing pol %d, channel %d" % (pol, channel))
                     if window is None:
                         comp_array[channel, pol, :, :], residual_array[channel, pol, :, :] = \
                             msclean(dirty.data[channel, pol, :, :], psf.data[channel, pol, :, :],
@@ -123,7 +123,7 @@ def deconvolve_cube(dirty: Image, psf: Image, **kwargs) -> (Image, Image):
                             msclean(dirty.data[channel, pol, :, :], psf.data[channel, pol, :, :],
                                     window[channel, pol, :, :], gain, thresh, niter, scales, fracthresh)
                 else:
-                    log.info("deconvolve_cube: Skipping pol %d, channel %d" % (pol, channel))
+                    logging.warn("deconvolve_cube: Skipping pol %d, channel %d" % (pol, channel))
 
         comp_image = create_image_from_array(comp_array, dirty.wcs, dirty.polarisation_frame)
         residual_image = create_image_from_array(residual_array, dirty.wcs, dirty.polarisation_frame)
